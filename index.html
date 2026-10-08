@@ -1,780 +1,1722 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ChemiCard - 화학식 & 원소기호 단어장</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>질량 보존 법칙과 입자 모형 - 중학교 3학년 과학</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; }
+    .atom-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.85; transform: scale(1.05); } }
+    .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     
-    <style>
-        body {
-            font-family: 'Inter', 'Noto Sans KR', sans-serif;
-            background-color: #f3f4f6;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* 3D Card Flip Styles */
-        .perspective-1000 {
-            perspective: 1000px;
-        }
-        .transform-style-3d {
-            transform-style: preserve-3d;
-        }
-        .backface-hidden {
-            backface-visibility: hidden;
-        }
-        .rotate-y-180 {
-            transform: rotateY(180deg);
-        }
-        .card-inner {
-            transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
-        }
-        
-        /* Custom Scrollbar for list */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-        .screen {
-            display: none;
-        }
-        .screen.active {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-    </style>
+    /* Chemical Bond Styling */
+    .bond-line { stroke: #94a3b8; stroke-width: 3; stroke-linecap: round; }
+    .ion-group { transition: all 0.3s ease; }
+    .ion-group:hover { transform: scale(1.03); }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen flex flex-col text-slate-800">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-indigo-100 selection:text-indigo-800">
 
-    <header class="bg-white shadow-sm sticky top-0 z-10">
-        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 flex items-center gap-2 cursor-pointer" onclick="app.goHome()">
-                <i class="fa-solid fa-flask text-blue-600"></i> ChemiCard
-            </h1>
-            <div id="header-controls" class="hidden">
-                <button onclick="app.goHome()" class="text-slate-500 hover:text-slate-800 font-medium text-sm transition-colors flex items-center gap-1">
-                    <i class="fa-solid fa-xmark text-lg"></i> 종료
-                </button>
-            </div>
+  <!-- Top Navigation Header -->
+  <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-2">
+      <div class="flex items-center space-x-3">
+        <div class="bg-white/10 p-2 rounded-xl text-yellow-300">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
         </div>
-        <!-- Progress Bar -->
-        <div id="progress-container" class="h-1 bg-slate-100 hidden">
-            <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-purple-500 w-0 transition-all duration-300"></div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight">중3 과학: 질량 보존 법칙</h1>
+          <p class="text-xs text-indigo-200">화학 반응 전후 원자 보존 및 입자 구조 탐구</p>
         </div>
-    </header>
+      </div>
 
-    <main class="flex-grow flex flex-col items-center justify-center p-4 max-w-3xl mx-auto w-full">
+      <!-- Reaction Type Switcher -->
+      <div class="flex items-center space-x-2 bg-indigo-900/60 p-1 rounded-xl border border-indigo-500/30">
+        <button onclick="switchReactionMode('precipitate')" id="modePrecipBtn" class="text-xs px-3 py-1.5 rounded-lg font-bold transition bg-white text-indigo-900 shadow">
+          🧪 앙금 생성 반응
+        </button>
+        <button onclick="switchReactionMode('gas')" id="modeGasBtn" class="text-xs px-3 py-1.5 rounded-lg font-bold transition text-indigo-100 hover:bg-indigo-800">
+          🫧 기체 발생 반응
+        </button>
+      </div>
 
-        <section id="screen-home" class="screen active w-full w-full max-w-md">
-            <div class="bg-white rounded-3xl shadow-xl p-6 sm:p-8 border border-slate-100">
-                <div class="text-center mb-8">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">학습 설정</h2>
-                    <p class="text-slate-500 text-sm">중학교 3학년 화학식 & 원소기호</p>
-                </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="toggleTeacherView()" id="teacherToggleBtn" class="bg-indigo-800 hover:bg-indigo-900 text-xs px-3 py-1.5 rounded-lg border border-indigo-400/40 transition">
+          교사 화면
+        </button>
+        <button onclick="resetAllData()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
+          초기화
+        </button>
+      </div>
+    </div>
 
-                <div class="space-y-6">
-                    <!-- Category Selection -->
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">범주 선택</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button class="category-btn active border-2 border-blue-500 bg-blue-50 text-blue-700 rounded-xl py-2 font-medium text-sm transition-all" data-value="all">전체</button>
-                            <button class="category-btn border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 rounded-xl py-2 font-medium text-sm transition-all" data-value="element">원소 기호</button>
-                            <button class="category-btn border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 rounded-xl py-2 font-medium text-sm transition-all" data-value="formula">화학식</button>
-                        </div>
-                    </div>
+    <!-- Step Progress Indicator -->
+    <div class="bg-indigo-800/80 border-t border-indigo-600/50">
+      <div class="max-w-6xl mx-auto px-4 py-2 overflow-x-auto">
+        <div id="stepNav" class="flex space-x-2 min-w-max text-xs">
+          <!-- Step Buttons populated by JS -->
+        </div>
+      </div>
+    </div>
+  </header>
 
-                    <!-- Direction Selection -->
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">방향 선택</label>
-                        <div class="grid grid-cols-1 gap-2">
-                            <button class="direction-btn active border-2 border-purple-500 bg-purple-50 text-purple-700 rounded-xl py-3 font-medium text-sm transition-all flex items-center justify-center gap-2" data-value="ko2en">
-                                <span>한글</span> <i class="fa-solid fa-arrow-right text-xs"></i> <span>기호/화학식</span>
-                            </button>
-                            <button class="direction-btn border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 rounded-xl py-3 font-medium text-sm transition-all flex items-center justify-center gap-2" data-value="en2ko">
-                                <span>기호/화학식</span> <i class="fa-solid fa-arrow-right text-xs"></i> <span>한글</span>
-                            </button>
-                            <button class="direction-btn border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 rounded-xl py-3 font-medium text-sm transition-all" data-value="mixed">랜덤 혼합</button>
-                        </div>
-                    </div>
-                </div>
+  <!-- Main Content Viewport -->
+  <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
 
-                <div class="mt-8 space-y-3">
-                    <button onclick="app.start('flashcard')" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2 text-lg">
-                        <i class="fa-regular fa-clone"></i> 플래시카드 학습
-                    </button>
-                    <button onclick="app.start('test')" class="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-purple-500/30 transition-all flex items-center justify-center gap-2 text-lg">
-                        <i class="fa-solid fa-pencil"></i> 주관식 테스트
-                    </button>
-                    <button id="btn-study-unknown" onclick="app.start('flashcard', true)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl transition-all hidden items-center justify-center gap-2">
-                        <i class="fa-solid fa-rotate-left"></i> 모르는 단어만 재학습 (<span id="unknown-count">0</span>)
-                    </button>
-                </div>
+    <!-- Helper Disclaimer -->
+    <div class="flex justify-between items-center bg-indigo-50 border border-indigo-100 p-3 rounded-xl shadow-sm text-sm">
+      <div class="flex items-center space-x-2 text-indigo-900 font-medium">
+        <span class="inline-block w-2.5 h-2.5 bg-indigo-600 rounded-full"></span>
+        <span id="reactionTitleBadge" class="font-bold">현재 선택된 반응: [염화 나트륨 + 질산 은] 앙금 생성 반응</span>
+      </div>
+      <button onclick="openElementModal()" class="text-xs bg-white hover:bg-indigo-100 text-indigo-700 font-bold px-3 py-1.5 rounded-lg border border-indigo-200 transition shadow-sm">
+        🔍 원소 기호 도움말
+      </button>
+    </div>
+
+    <!-- STEP 1: Two Separate Glass Bottles Simulation -->
+    <section id="step1" class="step-panel fade-in bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+      <div class="border-b border-slate-100 pb-3 flex justify-between items-center flex-wrap gap-2">
+        <div>
+          <span class="text-xs font-bold text-indigo-600 tracking-wider uppercase">1단계</span>
+          <h2 class="text-xl font-bold text-slate-900" id="step1Header">실험 관찰: 독립된 두 유리병 속 물질의 반응</h2>
+          <p class="text-sm text-slate-600 mt-1">서로 다른 2개의 유리병에 담긴 반응 물질을 섞었을 때의 변화와 질량을 관찰하세요.</p>
+        </div>
+        
+        <!-- Closed / Open Vessel Toggle for Gas Reaction -->
+        <div id="gasVesselToggleBox" class="hidden bg-slate-100 p-1 rounded-xl border border-slate-300 text-xs font-bold flex space-x-1">
+          <button onclick="setGasVessel('closed')" id="vesselClosedBtn" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 text-white">🔒 밀폐 용기</button>
+          <button onclick="setGasVessel('open')" id="vesselOpenBtn" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">🔓 열린 용기</button>
+        </div>
+      </div>
+
+      <!-- Flask Simulation Container -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        <div class="bg-slate-900 p-6 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden min-h-[320px]">
+          
+          <!-- Interactive SVG showing TWO SEPARATE BOTTLES -->
+          <div class="relative w-full max-w-[320px] h-[240px] flex flex-col items-center justify-end">
+            <svg viewBox="0 0 320 220" class="w-full h-48 drop-shadow-lg">
+              <!-- Digital Balance Plate -->
+              <rect x="20" y="195" width="280" height="15" rx="4" fill="#475569" />
+
+              <!-- BOTTLE A (Left Bottle) -->
+              <g id="bottleA" class="transition-all duration-700 origin-bottom-left">
+                <!-- Cap -->
+                <rect x="65" y="60" width="20" height="12" rx="2" fill="#334155" />
+                <!-- Neck & Body -->
+                <path d="M 67,72 L 83,72 L 83,90 L 105,105 L 105,190 L 45,190 L 45,105 L 67,90 Z" fill="rgba(255, 255, 255, 0.2)" stroke="#94a3b8" stroke-width="3" />
+                <!-- Liquid A -->
+                <path id="liquidA" d="M 47,130 L 103,130 L 103,188 L 47,188 Z" fill="rgba(147, 197, 253, 0.5)" />
+                <!-- Label A -->
+                <rect x="52" y="140" width="46" height="20" rx="3" fill="#ffffff" opacity="0.9"/>
+                <text x="75" y="154" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle" id="labelBottleA">NaCl</text>
+              </g>
+
+              <!-- BOTTLE B (Right Bottle) -->
+              <g id="bottleB" class="transition-all duration-700 origin-bottom-right">
+                <!-- Cap -->
+                <rect x="235" y="60" width="20" height="12" rx="2" fill="#334155" />
+                <!-- Neck & Body -->
+                <path d="M 237,72 L 253,72 L 253,90 L 275,105 L 275,190 L 215,190 L 215,105 L 237,90 Z" fill="rgba(255, 255, 255, 0.2)" stroke="#94a3b8" stroke-width="3" />
+                <!-- Liquid B -->
+                <path id="liquidB" d="M 217,130 L 273,130 L 273,188 L 217,188 Z" fill="rgba(199, 210, 254, 0.5)" />
+                <!-- Label B -->
+                <rect x="222" y="140" width="46" height="20" rx="3" fill="#ffffff" opacity="0.9"/>
+                <text x="245" y="154" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle" id="labelBottleB">AgNO₃</text>
+              </g>
+
+              <!-- REACTION BEAKER (Appears upon mixing) -->
+              <g id="mixedBeaker" class="opacity-0 transition-opacity duration-700">
+                <!-- Main Flask Body -->
+                <path d="M 140,50 L 180,50 L 180,80 L 220,160 C 225,180 210,190 190,190 L 130,190 C 110,190 95,180 100,160 L 140,80 Z" 
+                      fill="rgba(255, 255, 255, 0.2)" stroke="#38bdf8" stroke-width="3" />
+                <!-- Plug (If closed) -->
+                <rect id="beakerPlug" x="145" y="40" width="30" height="12" rx="2" fill="#64748b" />
+                <!-- Mixed Solution -->
+                <path id="mixedSolution" d="M 108,160 Q 160,155 212,160 L 205,182 Q 160,188 115,182 Z" fill="rgba(226, 232, 240, 0.8)" />
+                
+                <!-- Precipitate Layer (For AgCl) -->
+                <g id="precipitateVisual" class="hidden">
+                  <ellipse cx="160" cy="184" rx="35" ry="5" fill="#ffffff" opacity="0.95" />
+                  <circle cx="145" cy="183" r="2.5" fill="#e2e8f0" />
+                  <circle cx="170" cy="185" r="3" fill="#cbd5e1" />
+                </g>
+
+                <!-- Gas Bubbles (For CO2) -->
+                <g id="gasVisual" class="hidden">
+                  <circle cx="150" cy="140" r="4" fill="#38bdf8" opacity="0.6" class="atom-pulse"/>
+                  <circle cx="165" cy="120" r="6" fill="#38bdf8" opacity="0.5" class="atom-pulse"/>
+                  <circle cx="155" cy="90" r="5" fill="#38bdf8" opacity="0.4" class="atom-pulse"/>
+                  <!-- Escaping Gas Particles if Open -->
+                  <g id="escapingGas" class="hidden">
+                    <path d="M 160,40 L 160,10 M 150,25 L 140,10 M 170,25 L 180,10" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="3,3" />
+                  </g>
+                </g>
+              </g>
+
+            </svg>
+
+            <!-- Digital Balance Display -->
+            <div class="bg-slate-800 border-2 border-slate-700 rounded-xl px-6 py-2 shadow-inner text-center w-full mt-2">
+              <div class="text-[10px] text-slate-400 font-semibold tracking-wider">전자 저울 질량 (DIGITAL BALANCE)</div>
+              <div id="scaleDisplay" class="font-mono text-2xl font-black text-emerald-400 tracking-wider">248.50 g</div>
             </div>
-        </section>
+          </div>
 
-        <section id="screen-flashcard" class="screen w-full w-full max-w-md">
-            <div class="flex justify-between items-center mb-4 px-2">
-                <div class="text-sm font-semibold text-slate-500" id="fc-progress-text">1 / 32</div>
-                <div class="text-xs text-slate-400 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-200"><i class="fa-solid fa-hand-pointer mr-1"></i> 탭해서 뒤집기</div>
+          <div class="mt-4 flex space-x-3">
+            <button onclick="runMixSimulation()" id="mixBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-sm transition shadow-lg flex items-center space-x-2">
+              <span>🧪 두 유리병 물질 섞기</span>
+            </button>
+            <button onclick="resetStep1()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-2 rounded-xl text-sm transition">
+              🔄 초기화
+            </button>
+          </div>
+        </div>
+
+        <!-- Student Observation Questionnaire -->
+        <div class="space-y-4">
+          <h3 class="font-bold text-slate-800 flex items-center space-x-2">
+            <span>📝 관찰 일지 기록하기</span>
+          </h3>
+          
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">1. 섞기 전 두 유리병 속 물질의 상태와 모습은 어떠하였나요?</label>
+            <input type="text" id="obsBefore" placeholder="예: 각각 투명한 액체 상태로 별도 용기에 담겨 있다" 
+                   class="w-full text-sm border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">2. 두 물질을 섞은 후 어떠한 변화가 관찰되었나요?</label>
+            <input type="text" id="obsAfter" placeholder="예: 흰색 앙금이 생겼다 / 거품(기체)이 발생했다" 
+                   class="w-full text-sm border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">3. 반응 전후 전체 질량 변화는 어떠하였나요?</label>
+            <input type="text" id="obsReason" placeholder="예: 밀폐된 용기에서는 섞은 후에도 질량이 248.50g으로 동일하다" 
+                   class="w-full text-sm border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+
+          <div id="step1Feedback" class="hidden p-3 rounded-xl text-xs font-medium bg-indigo-50 text-indigo-800 border border-indigo-200">
+            ✅ 관찰 기록 완료! 2단계로 이동하여 화학식을 직접 작성해 보세요.
+          </div>
+
+          <button onclick="submitStep1()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">
+            관찰 저장 및 2단계로 이동 👉
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2: Chemical Formula Input with Auto Subscripts & Case Sensitivity -->
+    <section id="step2" class="step-panel hidden fade-in bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+      <div class="border-b border-slate-100 pb-3">
+        <span class="text-xs font-bold text-indigo-600 tracking-wider uppercase">2단계</span>
+        <h2 class="text-xl font-bold text-slate-900">물질 이름을 화학식으로 표현하기 (대소문자 & 아래첨자 구별)</h2>
+        <p class="text-sm text-slate-600 mt-1">
+          원소 기호의 <strong>대문자와 소문자를 정확히 구분</strong>하여 입력하세요. 숫자를 입력하면 자동으로 아래첨자로 변환됩니다 (예: AgNO3 → AgNO₃).
+        </p>
+      </div>
+
+      <div id="step2FormulaGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Dynamically rendered according to reaction mode -->
+      </div>
+
+      <div id="step2CompleteMsg" class="hidden p-4 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 font-bold text-sm text-center">
+        🎉 모든 화학식을 정확히 완성했습니다! 이제 결합된 입자 구조 모형을 탐구해 봅시다.
+      </div>
+
+      <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+        <button onclick="goToStep(1)" class="text-xs text-slate-500 hover:text-slate-800 font-bold">👈 1단계로 돌아가기</button>
+        <button onclick="submitStep2()" id="step2NextBtn" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition opacity-50 cursor-not-allowed" disabled>
+          3단계로 이동 👉
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 3: Atomic Model with Grouped Ions & Molecules -->
+    <section id="step3" class="step-panel hidden fade-in bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+      <div class="border-b border-slate-100 pb-3">
+        <span class="text-xs font-bold text-indigo-600 tracking-wider uppercase">3단계</span>
+        <h2 class="text-xl font-bold text-slate-900">화학식 속 입자 결합 구조 및 원자 수 확인</h2>
+        <p class="text-sm text-slate-600 mt-1">화학식을 클릭하면 개별 원자가 독립적으로 흩어져 있지 않고, <strong>각 물질 특성에 맞춘 이온 및 분자 결합 입자 모형</strong>을 보여줍니다.</p>
+      </div>
+
+      <!-- Formula Selector Tabs -->
+      <div id="step3FormulaTabs" class="flex flex-wrap gap-2">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Grouped Compound View Box -->
+      <div class="bg-slate-900 text-white p-6 rounded-2xl space-y-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <span class="text-xs text-indigo-400 font-semibold uppercase">선택된 물질 결합 구조</span>
+            <div id="selectedFormulaDisplay" class="text-3xl font-black font-mono tracking-wider text-yellow-400 mt-1">
+              NaCl
             </div>
+          </div>
+          <div class="bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 text-xs text-slate-300">
+            📌 <strong class="text-indigo-300">구조 규칙:</strong> NO₃⁻, CO₃²⁻와 같은 다원자 이온 및 분자는 규칙적인 결합 모양으로 행동합니다.
+          </div>
+        </div>
 
-            <!-- Card Container -->
-            <div class="perspective-1000 w-full aspect-[4/3] sm:aspect-video md:aspect-[4/3] mb-8 cursor-pointer group" id="flashcard-container" onclick="app.flipCard()">
-                <div id="flashcard-inner" class="card-inner relative w-full h-full transform-style-3d shadow-2xl rounded-3xl">
-                    <!-- Front -->
-                    <div class="absolute w-full h-full backface-hidden bg-white rounded-3xl border border-slate-100 flex flex-col items-center justify-center p-6 text-center">
-                        <span id="fc-type-front" class="absolute top-6 left-6 text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-md">문제</span>
-                        <div id="fc-front-text" class="text-4xl sm:text-5xl font-bold text-slate-800 break-keep"></div>
-                    </div>
-                    <!-- Back -->
-                    <div class="absolute w-full h-full backface-hidden bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl shadow-inner flex flex-col items-center justify-center p-6 text-center rotate-y-180">
-                        <span id="fc-type-back" class="absolute top-6 left-6 text-xs font-bold text-white/80 bg-white/20 px-2 py-1 rounded-md">정답</span>
-                        <div id="fc-back-text" class="text-5xl sm:text-6xl font-bold text-white break-keep"></div>
-                    </div>
+        <!-- Interactive SVG Structural Rendering Container -->
+        <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-6 flex flex-col items-center justify-center min-h-[180px]" id="compoundStructureCanvas">
+          <!-- Rendered bonded structure -->
+        </div>
+
+        <!-- Breakdown list -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs" id="atomCountBreakdown">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+        <button onclick="goToStep(2)" class="text-xs text-slate-500 hover:text-slate-800 font-bold">👈 2단계로 돌아가기</button>
+        <button onclick="goToStep(4)" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition shadow-md">
+          4단계: 반응 전후 입자 모형 비교로 이동 👉
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 4: Compare Particles with Particle Models & Choice Buttons -->
+    <section id="step4" class="step-panel hidden fade-in bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+      <div class="border-b border-slate-100 pb-3">
+        <span class="text-xs font-bold text-indigo-600 tracking-wider uppercase">4단계</span>
+        <h2 class="text-xl font-bold text-slate-900">반응 전후 입자 모형 비교 및 보존 직접 판별</h2>
+        <p class="text-sm text-slate-600 mt-1">
+          반응 전과 반응 후의 <strong>원자/입자 결합 모형</strong>을 직접 비교하여, 각 원소별 <strong>'일치한다 / 일치하지 않는다'</strong>를 선택하세요.
+        </p>
+      </div>
+
+      <!-- Reaction Side Split View with Full SVG Particle Visualizations -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="step4ParticleView">
+        <!-- Reactants vs Products Particle Models Rendered by JS -->
+      </div>
+
+      <!-- Student Interactive Verification Choice Table -->
+      <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+        <div class="flex justify-between items-center flex-wrap gap-2">
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm">📊 원소별 반응 전후 원자 수 보존 직접 판별하기</h3>
+            <p class="text-xs text-slate-500">양쪽 입자 모형의 원자 개수를 비교한 후 올바른 보존 상태를 선택하세요.</p>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full text-center text-xs">
+            <thead>
+              <tr class="bg-slate-200 text-slate-700 font-bold">
+                <th class="p-2.5 rounded-l-lg">원소 이름</th>
+                <th class="p-2">원소 기호</th>
+                <th class="p-2 bg-amber-100 text-amber-900">반응 전 원자 수</th>
+                <th class="p-2 bg-emerald-100 text-emerald-900">반응 후 원자 수</th>
+                <th class="p-2.5 rounded-r-lg">보존 판별 선택 (정답 선택 시 통과)</th>
+              </tr>
+            </thead>
+            <tbody id="verifyTableBody" class="divide-y divide-slate-200 font-medium">
+              <!-- Dynamically populated with choice buttons -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="verifySuccessBanner" class="hidden p-3 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-bold text-center">
+          🎉 모든 원소의 원자 수가 반응 전후에 '일치한다'를 정확히 판별했습니다! (5단계로 이동할 수 있습니다)
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+        <button onclick="goToStep(3)" class="text-xs text-slate-500 hover:text-slate-800 font-bold">👈 3단계로 돌아가기</button>
+        <button onclick="goToStep(5)" id="step4NextBtn" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition opacity-50 cursor-not-allowed" disabled>
+          5단계: 계수 조정 연습으로 이동 👉
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 5: Coefficient Adjustment Practice (Support both Precipitate and Gas modes) -->
+    <section id="step5" class="step-panel hidden fade-in bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+      <div class="border-b border-slate-100 pb-3 flex justify-between items-center flex-wrap gap-2">
+        <div>
+          <span class="text-xs font-bold text-indigo-600 tracking-wider uppercase">5단계</span>
+          <h2 class="text-xl font-bold text-slate-900" id="step5TitleHeader">계수 조정 연습 (화학 반응식 완성하기)</h2>
+          <p class="text-sm text-slate-600 mt-1" id="step5SubHeader">선택된 반응 모드에 맞춘 화학 반응식의 계수를 변경하여 반응 전후 원자 수를 일치시켜 보세요.</p>
+        </div>
+        <span id="step5ModeBadge" class="text-xs font-bold px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full">연습 예시</span>
+      </div>
+
+      <!-- Rule Card -->
+      <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl text-xs text-rose-900 space-y-1 shadow-sm">
+        <p class="font-bold text-sm">⚠️ 계수와 아래 첨자의 차이점</p>
+        <p>• 아래 첨자를 수정하면 전혀 다른 종류의 화학 물질로 바뀌어 버립니다!</p>
+        <p>• 따라서 아래 첨자는 고정되며, 화학식 앞의 <strong>계수(분자 단위 개수)만 변경</strong>하여 양쪽 원자 수를 일치시켜야 합니다.</p>
+      </div>
+
+      <!-- Interactive Chemical Equation Adjuster Container -->
+      <div class="bg-slate-900 text-white p-6 rounded-2xl space-y-6 shadow-lg">
+        
+        <!-- Interactive Chemical Equation Render Area -->
+        <div class="text-center border-b border-slate-800 pb-4">
+          <span class="text-xs font-bold text-indigo-400" id="step5EqTitle">계수 조정 반응식</span>
+          <div id="step5EquationControls" class="flex items-center justify-center space-x-2 md:space-x-3 text-xl md:text-3xl font-black font-mono mt-3 flex-wrap gap-y-3">
+            <!-- Dynamically populated equation adjusters -->
+          </div>
+        </div>
+
+        <!-- Structured Molecular Bond Visualizer -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <h4 class="text-xs font-bold text-amber-400 mb-2" id="visReactantsTitle">반응물 결합 입자 모형</h4>
+            <div id="visReactants" class="flex flex-wrap gap-2 min-h-[90px] items-center p-2">
+              <!-- Rendered molecular structures -->
+            </div>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <h4 class="text-xs font-bold text-emerald-400 mb-2" id="visProductsTitle">생성물 결합 입자 모형</h4>
+            <div id="visProducts" class="flex flex-wrap gap-2 min-h-[90px] items-center p-2">
+              <!-- Rendered molecular structures -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Atom Counter Comparison Matrix -->
+        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+          <div class="grid grid-cols-3 text-center text-xs gap-2 font-bold">
+            <div class="text-slate-400">원소</div>
+            <div class="text-amber-300">반응 전 원자 수</div>
+            <div class="text-emerald-300">반응 후 원자 수</div>
+          </div>
+          <div class="divide-y divide-slate-700 text-xs mt-2 font-mono" id="step5CounterMatrix">
+            <!-- Dynamically populated counters -->
+          </div>
+        </div>
+
+        <!-- Status Message & Hint Control -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+          <div id="coeffStatus" class="text-xs font-bold p-3 rounded-xl w-full md:w-auto flex-1 bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            ⚠️ 원자의 수가 맞지 않습니다. 계수를 조정해 보세요!
+          </div>
+          <button onclick="requestStep5Hint()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 font-bold px-4 py-3 rounded-xl border border-slate-700 whitespace-nowrap">
+            💡 단계별 힌트 보기
+          </button>
+        </div>
+
+        <!-- Hint Dialog Box -->
+        <div id="step5HintBox" class="hidden p-4 rounded-xl bg-indigo-950/80 border border-indigo-700/60 text-xs text-indigo-200 space-y-2">
+          <p id="hintStepText" class="font-medium"></p>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+        <button onclick="goToStep(4)" class="text-xs text-slate-500 hover:text-slate-800 font-bold">👈 4단계로 돌아가기</button>
+        <button onclick="submitStep5()" id="step5NextBtn" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition opacity-50 cursor-not-allowed" disabled>
+          6단계: 개념 정리로 이동 👉
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 6: Mass Conservation Concept Completion -->
+    <section id="step6" class="step-panel hidden fade-in bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+      <div class="border-b border-slate-100 pb-3">
+        <span class="text-xs font-bold text-indigo-600 tracking-wider uppercase">6단계</span>
+        <h2 class="text-xl font-bold text-slate-900">질량 보존 법칙 핵심 개념 정리</h2>
+        <p class="text-sm text-slate-600 mt-1">탐구한 결과를 바탕으로 원자의 보존과 전체 질량 보존의 관계 문장을 완성해 보세요.</p>
+      </div>
+
+      <div class="bg-indigo-900 text-white p-6 rounded-2xl space-y-4">
+        <h3 class="font-bold text-sm text-indigo-300 flex items-center space-x-2">
+          <span>⚖️ 질량 보존 원리의 핵심 규칙</span>
+        </h3>
+
+        <div class="space-y-4 text-sm leading-relaxed font-medium">
+          <p>
+            "화학 반응이 일어날 때, 반응 전후 원자의 종류와 수는 
+            <select id="blank1" class="bg-slate-800 text-yellow-300 border border-slate-700 rounded-lg px-2 py-1 font-bold">
+              <option value="">[선택]</option>
+              <option value="changed">변한다</option>
+              <option value="conserved">변하지 않고 보존된다</option>
+              <option value="increased">증가한다</option>
+            </select>."
+          </p>
+
+          <p>
+            "원자가 새로 생기거나 사라지는 것이 아니라, 원자의 
+            <select id="blank2" class="bg-slate-800 text-yellow-300 border border-slate-700 rounded-lg px-2 py-1 font-bold">
+              <option value="">[선택]</option>
+              <option value="element">종류가 바뀐다</option>
+              <option value="rearrange">배열과 결합 상태만 달라진다</option>
+              <option value="mass">질량이 감소한다</option>
+            </select>."
+          </p>
+
+          <p>
+            "따라서 밀폐된 전체 반응계의 질량은 
+            <select id="blank3" class="bg-slate-800 text-yellow-300 border border-slate-700 rounded-lg px-2 py-1 font-bold">
+              <option value="">[선택]</option>
+              <option value="equal">반응 전후에 일정하게 보존된다</option>
+              <option value="heavier">반응 후 더 무거워진다</option>
+              <option value="lighter">반응 후 더 가벼워진다</option>
+            </select>."
+          </p>
+        </div>
+      </div>
+
+      <!-- Student Summary Text Area -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-700">
+          ✏️ 원자의 보존과 전체 질량 보존의 관계를 자신의 언어로 요약 설명해 보세요:
+        </label>
+        <textarea id="studentSummaryText" rows="3" 
+                  placeholder="예: 반응 전후 원자의 종류와 수가 일정하고 결합만 바뀌므로 전체 질량은 일정하게 유지됩니다." 
+                  class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+      </div>
+
+      <div id="ruleFeedbackBox" class="hidden p-4 rounded-xl text-xs space-y-1"></div>
+
+      <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+        <button onclick="goToStep(5)" class="text-xs text-slate-500 hover:text-slate-800 font-bold">👈 5단계로 돌아가기</button>
+        <button onclick="submitStep6AndFinish()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition shadow-lg">
+          🏁 학습 완료 및 결과 요약 보기
+        </button>
+      </div>
+    </section>
+
+    <!-- FINAL SUMMARY SCREEN -->
+    <section id="summaryScreen" class="step-panel hidden fade-in bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+      <div class="border-b border-slate-100 pb-4 flex justify-between items-center">
+        <div>
+          <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">학습 완료 리포트</span>
+          <h2 class="text-2xl font-bold text-slate-900">질량 보존 법칙 활동 요약</h2>
+        </div>
+        <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition border border-slate-300">
+          🖨️ 리포트 인쇄
+        </button>
+      </div>
+
+      <div id="reportContent" class="space-y-4 text-xs md:text-sm">
+        <!-- Dynamically rendered by JS -->
+      </div>
+
+      <div class="flex justify-center pt-4 border-t border-slate-100">
+        <button onclick="goToStep(1)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-sm shadow-md transition">
+          🔄 처음부터 다시 탐구하기
+        </button>
+      </div>
+    </section>
+
+    <!-- TEACHER DASHBOARD MODAL -->
+    <div id="teacherModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white max-w-2xl w-full rounded-2xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+          <h3 class="font-bold text-lg text-slate-900">👨‍‍🏫 교사용 실시간 요약 대시보드</h3>
+          <button onclick="toggleTeacherView()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        </div>
+
+        <div class="text-xs text-slate-600 space-y-2">
+          <p>• 학생 개인정보를 수집하지 않는 익명 세션 진단 화면입니다.</p>
+          <p>• 힌트 사용 내역은 감점 요소가 아니며 학생 개별 학습 진단 보조 자료입니다.</p>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+          <h4 class="font-bold text-slate-800 text-xs">📊 학습 수행 데이터</h4>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-white p-3 rounded-lg border border-slate-200">
+              <span class="text-slate-500 block">선택한 반응 유형</span>
+              <strong id="teachReactionMode" class="text-indigo-600 font-bold text-sm">앙금 생성 반응</strong>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200">
+              <span class="text-slate-500 block">진행 단계 / 힌트 사용</span>
+              <strong id="teachProgress" class="text-emerald-600 font-bold text-sm">1단계 / 0회</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 pt-3 flex justify-end">
+          <button onclick="toggleTeacherView()" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ELEMENT HELPER MODAL -->
+    <div id="elementModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white max-w-md w-full rounded-2xl p-6 space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+          <h3 class="font-bold text-base text-slate-900">📖 원소 기호 및 이온 도움말</h3>
+          <button onclick="closeElementModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="p-2 bg-orange-50 border border-orange-200 rounded-xl flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-full bg-orange-500 text-white font-bold flex items-center justify-center">Na</span>
+            <div><strong class="block text-slate-800">나트륨</strong><span class="text-slate-500">Sodium</span></div>
+          </div>
+          <div class="p-2 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center">Cl</span>
+            <div><strong class="block text-slate-800">염소</strong><span class="text-slate-500">Chlorine</span></div>
+          </div>
+          <div class="p-2 bg-slate-100 border border-slate-300 rounded-xl flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-full bg-slate-400 text-slate-900 font-bold flex items-center justify-center">Ag</span>
+            <div><strong class="block text-slate-800">은</strong><span class="text-slate-500">Silver</span></div>
+          </div>
+          <div class="p-2 bg-blue-50 border border-blue-200 rounded-xl flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-full bg-blue-500 text-white font-bold flex items-center justify-center">N</span>
+            <div><strong class="block text-slate-800">질소</strong><span class="text-slate-500">Nitrogen</span></div>
+          </div>
+          <div class="p-2 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-full bg-red-500 text-white font-bold flex items-center justify-center">O</span>
+            <div><strong class="block text-slate-800">산소</strong><span class="text-slate-500">Oxygen</span></div>
+          </div>
+          <div class="p-2 bg-purple-50 border border-purple-200 rounded-xl flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center">Ca</span>
+            <div><strong class="block text-slate-800">칼슘</strong><span class="text-slate-500">Calcium</span></div>
+          </div>
+          <div class="p-2 bg-yellow-50 border border-yellow-200 rounded-xl flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-full bg-amber-500 text-white font-bold flex items-center justify-center">C</span>
+            <div><strong class="block text-slate-800">탄소</strong><span class="text-slate-500">Carbon</span></div>
+          </div>
+          <div class="p-2 bg-cyan-50 border border-cyan-200 rounded-xl flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-full bg-cyan-500 text-white font-bold flex items-center justify-center">H</span>
+            <div><strong class="block text-slate-800">수소</strong><span class="text-slate-500">Hydrogen</span></div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 pt-3 flex justify-end">
+          <button onclick="closeElementModal()" class="bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-xl">확인</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Subscript helper conversion map
+    const subscriptMap = { '0':'₀', '1':'₁', '2':'₂', '3':'₃', '4':'₄', '5':'₅', '6':'₆', '7':'₇', '8':'₈', '9':'₉' };
+    function toSubscript(str) {
+      return str.replace(/[0-9]/g, letter => subscriptMap[letter] || letter);
+    }
+
+    // Application State
+    const state = {
+      reactionMode: 'precipitate', // 'precipitate' or 'gas'
+      gasVessel: 'closed',        // 'closed' or 'open'
+      currentStep: 1,
+      hintCount: 0,
+      step1: { mixed: false, obsBefore: '', obsAfter: '', obsReason: '' },
+      step2: { done: false, userInputs: {} },
+      step3: { selectedFormula: 'NaCl' },
+      step4: { userChoices: {} }, // map of sym -> 'yes' or 'no'
+      step5: {
+        precipitate: { coeffH2: 1, coeffO2: 1, coeffH2O: 1, hintStep: 0 },
+        gas: { coeffCH4: 1, coeffO2: 1, coeffCO2: 1, coeffH2O: 1, hintStep: 0 }
+      },
+      step6: { blank1: '', blank2: '', blank3: '', summaryText: '' }
+    };
+
+    // Reaction definitions
+    const reactions = {
+      precipitate: {
+        title: "앙금 생성 반응 (염화 나트륨 + 질산 은)",
+        bottleA: "NaCl",
+        bottleB: "AgNO₃",
+        reactants: [
+          { name: "염화 나트륨", key: "NaCl", formula: "NaCl" },
+          { name: "질산 은", key: "AgNO3", formula: "AgNO₃" }
+        ],
+        products: [
+          { name: "염화 은 (흰색 앙금)", key: "AgCl", formula: "AgCl" },
+          { name: "질산 나트륨 (용액)", key: "NaNO3", formula: "NaNO₃" }
+        ],
+        elements: [
+          { name: "나트륨", sym: "Na", countReact: 1, countProd: 1, color: "bg-orange-100 text-orange-800" },
+          { name: "염소", sym: "Cl", countReact: 1, countProd: 1, color: "bg-emerald-100 text-emerald-800" },
+          { name: "은", sym: "Ag", countReact: 1, countProd: 1, color: "bg-slate-200 text-slate-800" },
+          { name: "질소", sym: "N", countReact: 1, countProd: 1, color: "bg-blue-100 text-blue-800" },
+          { name: "산소", sym: "O", countReact: 3, countProd: 3, color: "bg-red-100 text-red-800" }
+        ]
+      },
+      gas: {
+        title: "기체 발생 반응 (탄산 칼슘 + 묽은 염산)",
+        bottleA: "CaCO₃",
+        bottleB: "2 HCl",
+        reactants: [
+          { name: "탄산 칼슘", key: "CaCO3", formula: "CaCO₃" },
+          { name: "염화 수소 (염산)", key: "HCl", formula: "HCl" }
+        ],
+        products: [
+          { name: "염화 칼슘", key: "CaCl2", formula: "CaCl₂" },
+          { name: "이산화 탄소 (기체)", key: "CO2", formula: "CO₂" },
+          { name: "물", key: "H2O", formula: "H₂O" }
+        ],
+        elements: [
+          { name: "칼슘", sym: "Ca", countReact: 1, countProd: 1, color: "bg-purple-100 text-purple-800" },
+          { name: "탄소", sym: "C", countReact: 1, countProd: 1, color: "bg-yellow-100 text-yellow-800" },
+          { name: "산소", sym: "O", countReact: 3, countProd: 3, color: "bg-red-100 text-red-800" },
+          { name: "수소", sym: "H", countReact: 2, countProd: 2, color: "bg-cyan-100 text-cyan-800" },
+          { name: "염소", sym: "Cl", countReact: 2, countProd: 2, color: "bg-emerald-100 text-emerald-800" }
+        ]
+      }
+    };
+
+    const stepTitles = ["1. 관찰", "2. 화학식", "3. 입자구조", "4. 보존검증", "5. 계수연습", "6. 개념정리"];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderStepNav();
+      goToStep(state.currentStep);
+    });
+
+    function saveState() {
+      try { localStorage.setItem('massConserveState3', JSON.stringify(state)); } catch(e){}
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem('massConserveState3');
+        if (saved) Object.assign(state, JSON.parse(saved));
+      } catch(e){}
+    }
+
+    function resetAllData() {
+      if (confirm('모든 학습 내용이 초기화됩니다. 계속하시겠습니까?')) {
+        localStorage.removeItem('massConserveState3');
+        location.reload();
+      }
+    }
+
+    function switchReactionMode(mode) {
+      state.reactionMode = mode;
+      state.step4.userChoices = {}; // reset Step 4 verification choice for new mode
+      document.getElementById('modePrecipBtn').className = mode === 'precipitate' ? 'text-xs px-3 py-1.5 rounded-lg font-bold transition bg-white text-indigo-900 shadow' : 'text-xs px-3 py-1.5 rounded-lg font-bold transition text-indigo-100 hover:bg-indigo-800';
+      document.getElementById('modeGasBtn').className = mode === 'gas' ? 'text-xs px-3 py-1.5 rounded-lg font-bold transition bg-white text-indigo-900 shadow' : 'text-xs px-3 py-1.5 rounded-lg font-bold transition text-indigo-100 hover:bg-indigo-800';
+      
+      const gasToggleBox = document.getElementById('gasVesselToggleBox');
+      if (mode === 'gas') {
+        gasToggleBox.classList.remove('hidden');
+      } else {
+        gasToggleBox.classList.add('hidden');
+      }
+
+      document.getElementById('reactionTitleBadge').textContent = `현재 선택된 반응: ${reactions[mode].title}`;
+      document.getElementById('labelBottleA').textContent = reactions[mode].bottleA;
+      document.getElementById('labelBottleB').textContent = reactions[mode].bottleB;
+
+      resetStep1();
+      saveState();
+      renderStep2Grid();
+      renderStep3Tabs();
+      renderStep4View();
+      renderStep5View();
+    }
+
+    function setGasVessel(type) {
+      state.gasVessel = type;
+      document.getElementById('vesselClosedBtn').className = type === 'closed' ? 'px-2.5 py-1.5 rounded-lg bg-indigo-600 text-white' : 'px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200';
+      document.getElementById('vesselOpenBtn').className = type === 'open' ? 'px-2.5 py-1.5 rounded-lg bg-rose-600 text-white' : 'px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200';
+      
+      if (state.step1.mixed) runMixSimulation();
+    }
+
+    function renderStepNav() {
+      const container = document.getElementById('stepNav');
+      container.innerHTML = stepTitles.map((title, idx) => {
+        const stepNum = idx + 1;
+        return `
+          <button onclick="goToStep(${stepNum})" 
+                  class="px-3 py-1.5 rounded-lg font-bold transition flex items-center space-x-1 ${
+                    state.currentStep === stepNum 
+                      ? 'bg-white text-indigo-900 shadow' 
+                      : 'bg-indigo-700/60 text-indigo-100 hover:bg-indigo-700'
+                  }">
+            <span>${title}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function goToStep(stepNum) {
+      state.currentStep = stepNum;
+      saveState();
+      renderStepNav();
+
+      document.querySelectorAll('.step-panel').forEach(panel => panel.classList.add('hidden'));
+      
+      if (stepNum <= 6) {
+        document.getElementById(`step${stepNum}`).classList.remove('hidden');
+      } else {
+        document.getElementById('summaryScreen').classList.remove('hidden');
+        renderSummaryReport();
+      }
+
+      if (stepNum === 2) renderStep2Grid();
+      if (stepNum === 3) renderStep3Tabs();
+      if (stepNum === 4) renderStep4View();
+      if (stepNum === 5) renderStep5View();
+
+      document.getElementById('teachProgress').textContent = `${stepNum}단계 / ${state.hintCount}회`;
+      document.getElementById('teachReactionMode').textContent = reactions[state.reactionMode].title;
+    }
+
+    function runMixSimulation() {
+      state.step1.mixed = true;
+      const bA = document.getElementById('bottleA');
+      const bB = document.getElementById('bottleB');
+      const mixedBeaker = document.getElementById('mixedBeaker');
+      const scale = document.getElementById('scaleDisplay');
+      const prec = document.getElementById('precipitateVisual');
+      const gas = document.getElementById('gasVisual');
+      const escaping = document.getElementById('escapingGas');
+      const plug = document.getElementById('beakerPlug');
+
+      bA.classList.add('opacity-20');
+      bB.classList.add('opacity-20');
+      mixedBeaker.classList.remove('opacity-0');
+
+      if (state.reactionMode === 'precipitate') {
+        prec.classList.remove('hidden');
+        gas.classList.add('hidden');
+        plug.classList.remove('hidden');
+        scale.textContent = "248.50 g";
+      } else {
+        prec.classList.add('hidden');
+        gas.classList.remove('hidden');
+        if (state.gasVessel === 'open') {
+          plug.classList.add('hidden');
+          escaping.classList.remove('hidden');
+          scale.textContent = "244.10 g (기체 도출)";
+          scale.classList.add('text-rose-400');
+        } else {
+          plug.classList.remove('hidden');
+          escaping.classList.add('hidden');
+          scale.textContent = "248.50 g (질량 보존)";
+          scale.classList.remove('text-rose-400');
+        }
+      }
+
+      saveState();
+    }
+
+    function resetStep1() {
+      state.step1.mixed = false;
+      document.getElementById('bottleA').classList.remove('opacity-20');
+      document.getElementById('bottleB').classList.remove('opacity-20');
+      document.getElementById('mixedBeaker').classList.add('opacity-0');
+      document.getElementById('scaleDisplay').textContent = "248.50 g";
+      document.getElementById('scaleDisplay').classList.remove('text-rose-400');
+      document.getElementById('step1Feedback').classList.add('hidden');
+      saveState();
+    }
+
+    function submitStep1() {
+      state.step1.obsBefore = document.getElementById('obsBefore').value;
+      state.step1.obsAfter = document.getElementById('obsAfter').value;
+      state.step1.obsReason = document.getElementById('obsReason').value;
+
+      document.getElementById('step1Feedback').classList.remove('hidden');
+      setTimeout(() => goToStep(2), 1000);
+    }
+
+    function renderStep2Grid() {
+      const container = document.getElementById('step2FormulaGrid');
+      const rx = reactions[state.reactionMode];
+
+      container.innerHTML = `
+        <div class="bg-amber-50/70 border border-amber-200 p-4 rounded-2xl space-y-4">
+          <h3 class="font-bold text-amber-900 text-sm">🔹 반응물 (반응 전)</h3>
+          ${rx.reactants.map(r => `
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">${r.name}</label>
+              <div class="flex space-x-2">
+                <input type="text" id="input_${r.key}" oninput="autoFormatSubscript(this)" 
+                       placeholder="예: ${r.key}" class="flex-1 text-sm border border-slate-300 rounded-xl p-2.5 font-mono">
+                <button onclick="checkExactFormula('${r.key}', '${r.key}')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl">확인</button>
+              </div>
+              <p id="hint_${r.key}" class="text-xs mt-1 text-slate-500 font-medium"></p>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="bg-emerald-50/70 border border-emerald-200 p-4 rounded-xl space-y-4">
+          <h3 class="font-bold text-emerald-900 text-sm">🔸 생성물 (반응 후)</h3>
+          ${rx.products.map(p => `
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">${p.name}</label>
+              <div class="flex space-x-2">
+                <input type="text" id="input_${p.key}" oninput="autoFormatSubscript(this)" 
+                       placeholder="예: ${p.key}" class="flex-1 text-sm border border-slate-300 rounded-xl p-2.5 font-mono">
+                <button onclick="checkExactFormula('${p.key}', '${p.key}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl">확인</button>
+              </div>
+              <p id="hint_${p.key}" class="text-xs mt-1 text-slate-500 font-medium"></p>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function autoFormatSubscript(input) {
+      const raw = input.value;
+      let formatted = "";
+      for (let i = 0; i < raw.length; i++) {
+        const char = raw[i];
+        if (/[0-9]/.test(char) && i > 0 && /[a-zA-Z₀-₉]/.test(raw[i-1])) {
+          formatted += subscriptMap[char] || char;
+        } else {
+          formatted += char;
+        }
+      }
+      input.value = formatted;
+    }
+
+    function checkExactFormula(key, expected) {
+      const input = document.getElementById(`input_${key}`);
+      const hint = document.getElementById(`hint_${key}`);
+      let val = input.value.trim();
+
+      let normalized = val;
+      for (let digit in subscriptMap) {
+        normalized = normalized.replaceAll(subscriptMap[digit], digit);
+      }
+
+      if (normalized === expected) {
+        state.step2.userInputs[key] = true;
+        input.classList.add('border-emerald-500', 'bg-emerald-50');
+        hint.textContent = '✅ 정답입니다! (대소문자 및 숫자가 일치합니다)';
+        hint.className = 'text-xs mt-1 font-bold text-emerald-600';
+      } else if (normalized.toUpperCase() === expected.toUpperCase()) {
+        state.hintCount++;
+        input.classList.add('border-rose-400');
+        hint.textContent = '💡 힌트: 원소 기호의 대문자와 소문자를 구분해야 합니다 (예: Na, Cl, Ag, Ca, O).';
+        hint.className = 'text-xs mt-1 font-medium text-amber-600';
+      } else {
+        state.hintCount++;
+        input.classList.add('border-rose-400');
+        hint.textContent = `💡 힌트: 올바른 기호는 '${toSubscript(expected)}' 입니다. 대소문자를 맞춰보세요.`;
+        hint.className = 'text-xs mt-1 font-medium text-amber-600';
+      }
+
+      saveState();
+      
+      const rx = reactions[state.reactionMode];
+      const allKeys = [...rx.reactants.map(r => r.key), ...rx.products.map(p => p.key)];
+      const allDone = allKeys.every(k => state.step2.userInputs[k] === true);
+
+      if (allDone) {
+        document.getElementById('step2CompleteMsg').classList.remove('hidden');
+        const nextBtn = document.getElementById('step2NextBtn');
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function submitStep2() {
+      goToStep(3);
+    }
+
+    function renderStep3Tabs() {
+      const rx = reactions[state.reactionMode];
+      const container = document.getElementById('step3FormulaTabs');
+      const allItems = [...rx.reactants, ...rx.products];
+
+      container.innerHTML = allItems.map((item, idx) => `
+        <button onclick="selectCompoundStructure('${item.key}')" 
+                class="compound-tab-btn ${idx === 0 ? 'bg-indigo-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'} font-bold px-4 py-2 rounded-xl text-sm transition shadow-sm" 
+                data-key="${item.key}">
+          ${item.formula} (${item.name})
+        </button>
+      `).join('');
+
+      selectCompoundStructure(allItems[0].key);
+    }
+
+    function getParticleSVG(key) {
+      if (key === 'NaCl') {
+        return `
+          <svg viewBox="0 0 200 100" class="w-64 h-28">
+            <line x1="70" y1="50" x2="130" y2="50" stroke="#64748b" stroke-width="4" stroke-dasharray="2,2"/>
+            <circle cx="70" cy="50" r="22" fill="#f97316" />
+            <text x="70" y="55" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Na⁺</text>
+            <circle cx="130" cy="50" r="26" fill="#10b981" />
+            <text x="130" y="55" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Cl⁻</text>
+          </svg>
+        `;
+      } else if (key === 'AgNO3') {
+        return `
+          <svg viewBox="0 0 260 120" class="w-80 h-32">
+            <line x1="60" y1="60" x2="140" y2="60" stroke="#64748b" stroke-width="3" stroke-dasharray="2,2"/>
+            <circle cx="60" cy="60" r="22" fill="#94a3b8" />
+            <text x="60" y="65" font-size="12" font-weight="bold" fill="#0f172a" text-anchor="middle">Ag⁺</text>
+            <g class="ion-group">
+              <rect x="120" y="10" width="125" height="100" rx="12" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,4"/>
+              <text x="230" y="30" font-size="10" font-weight="bold" fill="#60a5fa">NO₃⁻</text>
+              <line x1="170" y1="60" x2="145" y2="35" class="bond-line"/>
+              <line x1="170" y1="60" x2="195" y2="35" class="bond-line"/>
+              <line x1="170" y1="60" x2="170" y2="90" class="bond-line"/>
+              <circle cx="170" cy="60" r="18" fill="#3b82f6" />
+              <text x="170" y="64" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">N</text>
+              <circle cx="145" cy="35" r="14" fill="#ef4444" />
+              <text x="145" y="39" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+              <circle cx="195" cy="35" r="14" fill="#ef4444" />
+              <text x="195" y="39" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+              <circle cx="170" cy="90" r="14" fill="#ef4444" />
+              <text x="170" y="94" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+            </g>
+          </svg>
+        `;
+      } else if (key === 'AgCl') {
+        return `
+          <svg viewBox="0 0 200 100" class="w-64 h-28">
+            <line x1="70" y1="50" x2="130" y2="50" stroke="#38bdf8" stroke-width="4"/>
+            <circle cx="70" cy="50" r="22" fill="#94a3b8" />
+            <text x="70" y="55" font-size="12" font-weight="bold" fill="#0f172a" text-anchor="middle">Ag</text>
+            <circle cx="130" cy="50" r="26" fill="#10b981" />
+            <text x="130" y="55" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Cl</text>
+          </svg>
+        `;
+      } else if (key === 'NaNO3') {
+        return `
+          <svg viewBox="0 0 260 120" class="w-80 h-32">
+            <line x1="60" y1="60" x2="140" y2="60" stroke="#64748b" stroke-width="3" stroke-dasharray="2,2"/>
+            <circle cx="60" cy="60" r="22" fill="#f97316" />
+            <text x="60" y="65" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Na⁺</text>
+            <g class="ion-group">
+              <rect x="120" y="10" width="125" height="100" rx="12" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,4"/>
+              <text x="230" y="30" font-size="10" font-weight="bold" fill="#60a5fa">NO₃⁻</text>
+              <line x1="170" y1="60" x2="145" y2="35" class="bond-line"/>
+              <line x1="170" y1="60" x2="195" y2="35" class="bond-line"/>
+              <line x1="170" y1="60" x2="170" y2="90" class="bond-line"/>
+              <circle cx="170" cy="60" r="18" fill="#3b82f6" />
+              <text x="170" y="64" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">N</text>
+              <circle cx="145" cy="35" r="14" fill="#ef4444" />
+              <text x="145" y="39" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+              <circle cx="195" cy="35" r="14" fill="#ef4444" />
+              <text x="195" y="39" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+              <circle cx="170" cy="90" r="14" fill="#ef4444" />
+              <text x="170" y="94" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+            </g>
+          </svg>
+        `;
+      } else if (key === 'CaCO3') {
+        return `
+          <svg viewBox="0 0 260 120" class="w-80 h-32">
+            <line x1="60" y1="60" x2="140" y2="60" stroke="#64748b" stroke-width="3" stroke-dasharray="2,2"/>
+            <circle cx="60" cy="60" r="24" fill="#a855f7" />
+            <text x="60" y="65" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Ca²⁺</text>
+            <g class="ion-group">
+              <rect x="120" y="10" width="125" height="100" rx="12" fill="rgba(234, 179, 8, 0.15)" stroke="#eab308" stroke-width="1.5" stroke-dasharray="4,4"/>
+              <text x="225" y="30" font-size="10" font-weight="bold" fill="#eab308">CO₃²⁻</text>
+              <line x1="170" y1="60" x2="145" y2="35" class="bond-line"/>
+              <line x1="170" y1="60" x2="195" y2="35" class="bond-line"/>
+              <line x1="170" y1="60" x2="170" y2="90" class="bond-line"/>
+              <circle cx="170" cy="60" r="18" fill="#eab308" />
+              <text x="170" y="64" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">C</text>
+              <circle cx="145" cy="35" r="14" fill="#ef4444" />
+              <text x="145" y="39" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+              <circle cx="195" cy="35" r="14" fill="#ef4444" />
+              <text x="195" y="39" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+              <circle cx="170" cy="90" r="14" fill="#ef4444" />
+              <text x="170" y="94" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+            </g>
+          </svg>
+        `;
+      } else if (key === 'HCl') {
+        return `
+          <svg viewBox="0 0 180 90" class="w-56 h-24">
+            <line x1="60" y1="45" x2="120" y2="45" stroke="#38bdf8" stroke-width="4"/>
+            <circle cx="60" cy="45" r="16" fill="#06b6d4" />
+            <text x="60" y="49" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">H</text>
+            <circle cx="120" cy="45" r="24" fill="#10b981" />
+            <text x="120" y="50" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Cl</text>
+          </svg>
+        `;
+      } else if (key === 'CaCl2') {
+        return `
+          <svg viewBox="0 0 240 100" class="w-72 h-28">
+            <line x1="60" y1="50" x2="120" y2="50" stroke="#64748b" stroke-width="3" stroke-dasharray="2,2"/>
+            <line x1="180" y1="50" x2="120" y2="50" stroke="#64748b" stroke-width="3" stroke-dasharray="2,2"/>
+            <circle cx="60" cy="50" r="22" fill="#10b981" />
+            <text x="60" y="55" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Cl⁻</text>
+            <circle cx="120" cy="50" r="24" fill="#a855f7" />
+            <text x="120" y="55" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Ca²⁺</text>
+            <circle cx="180" cy="50" r="22" fill="#10b981" />
+            <text x="180" y="55" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Cl⁻</text>
+          </svg>
+        `;
+      } else if (key === 'CO2') {
+        return `
+          <svg viewBox="0 0 220 90" class="w-64 h-24">
+            <line x1="50" y1="45" x2="110" y2="45" stroke="#ef4444" stroke-width="5"/>
+            <line x1="110" y1="45" x2="170" y2="45" stroke="#ef4444" stroke-width="5"/>
+            <circle cx="50" cy="45" r="18" fill="#ef4444" />
+            <text x="50" y="49" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+            <circle cx="110" cy="45" r="20" fill="#eab308" />
+            <text x="110" y="49" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">C</text>
+            <circle cx="170" cy="45" r="18" fill="#ef4444" />
+            <text x="170" y="49" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+          </svg>
+        `;
+      } else if (key === 'H2O') {
+        return `
+          <svg viewBox="0 0 180 100" class="w-56 h-28">
+            <line x1="90" y1="35" x2="50" y2="70" stroke="#06b6d4" stroke-width="3"/>
+            <line x1="90" y1="35" x2="130" y2="70" stroke="#06b6d4" stroke-width="3"/>
+            <circle cx="90" cy="35" r="22" fill="#ef4444" />
+            <text x="90" y="40" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+            <circle cx="50" cy="70" r="16" fill="#06b6d4" />
+            <text x="50" y="74" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">H</text>
+            <circle cx="130" cy="70" r="16" fill="#06b6d4" />
+            <text x="130" y="74" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">H</text>
+          </svg>
+        `;
+      }
+      return '';
+    }
+
+    function selectCompoundStructure(key) {
+      state.step3.selectedFormula = key;
+      document.querySelectorAll('.compound-tab-btn').forEach(btn => {
+        if (btn.dataset.key === key) {
+          btn.className = 'compound-tab-btn bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition shadow-sm';
+        } else {
+          btn.className = 'compound-tab-btn bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition';
+        }
+      });
+
+      document.getElementById('selectedFormulaDisplay').textContent = toSubscript(key);
+      const canvas = document.getElementById('compoundStructureCanvas');
+      const bd = document.getElementById('atomCountBreakdown');
+
+      canvas.innerHTML = getParticleSVG(key);
+
+      if (key === 'NaCl') {
+        canvas.innerHTML += `<span class="text-xs text-slate-400 mt-2">Na⁺ 이온과 Cl⁻ 이온이 1:1로 결합된 이온 화합물 구조</span>`;
+        bd.innerHTML = `
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">나트륨 (Na)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">염소 (Cl)</span><strong class="text-yellow-400">1개</strong></div>
+        `;
+      } else if (key === 'AgNO3') {
+        canvas.innerHTML += `<span class="text-xs text-slate-400 mt-2">Ag⁺ 이온에 질산 이온(NO₃⁻, 산소 원자 3개 포함) 다원자 그룹이 결합한 구조</span>`;
+        bd.innerHTML = `
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">은 (Ag)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">질소 (N)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">산소 (O)</span><strong class="text-yellow-400">3개 (O 원자 3개 명시)</strong></div>
+        `;
+      } else if (key === 'AgCl') {
+        canvas.innerHTML += `<span class="text-xs text-slate-400 mt-2">Ag 원자와 Cl 원자가 결합하여 형성된 물에 녹지 않는 고체 앙금 단위</span>`;
+        bd.innerHTML = `
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">은 (Ag)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">염소 (Cl)</span><strong class="text-yellow-400">1개</strong></div>
+        `;
+      } else if (key === 'NaNO3') {
+        canvas.innerHTML += `<span class="text-xs text-slate-400 mt-2">Na⁺ 이온과 질산 이온(NO₃⁻, 산소 원자 3개 포함)이 결합된 수용액 상태 화합물</span>`;
+        bd.innerHTML = `
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">나트륨 (Na)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">질소 (N)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">산소 (O)</span><strong class="text-yellow-400">3개 (O 원자 3개 명시)</strong></div>
+        `;
+      } else if (key === 'CaCO3') {
+        canvas.innerHTML += `<span class="text-xs text-slate-400 mt-2">Ca²⁺ 이온과 탄산 이온(CO₃²⁻, C 1개 + O 3개)이 결합된 구조</span>`;
+        bd.innerHTML = `
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">칼슘 (Ca)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">탄소 (C)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">산소 (O)</span><strong class="text-yellow-400">3개</strong></div>
+        `;
+      } else if (key === 'HCl') {
+        canvas.innerHTML += `<span class="text-xs text-slate-400 mt-2">H 원자와 Cl 원자가 결합된 염화 수소(HCl) 분자 구조</span>`;
+        bd.innerHTML = `
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">수소 (H)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">염소 (Cl)</span><strong class="text-yellow-400">1개</strong></div>
+        `;
+      } else if (key === 'CaCl2') {
+        canvas.innerHTML += `<span class="text-xs text-slate-400 mt-2">Ca²⁺ 이온 1개에 Cl⁻ 이온 2개가 결합한 염화 칼슘 구조</span>`;
+        bd.innerHTML = `
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">칼슘 (Ca)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">염소 (Cl)</span><strong class="text-yellow-400">2개</strong></div>
+        `;
+      } else if (key === 'CO2') {
+        canvas.innerHTML += `<span class="text-xs text-slate-400 mt-2">중심 탄소(C) 원자 양쪽에 산소(O) 원자 2개가 직선으로 결합된 CO₂ 분자</span>`;
+        bd.innerHTML = `
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">탄소 (C)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">산소 (O)</span><strong class="text-yellow-400">2개</strong></div>
+        `;
+      } else if (key === 'H2O') {
+        canvas.innerHTML += `<span class="text-xs text-slate-400 mt-2">중심 산소(O) 원자에 수소(H) 원자 2개가 굽은 형태로 결합된 H₂O 분자</span>`;
+        bd.innerHTML = `
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">산소 (O)</span><strong class="text-yellow-400">1개</strong></div>
+          <div class="bg-slate-800 p-2.5 rounded-xl text-center"><span class="text-slate-400 block">수소 (H)</span><strong class="text-yellow-400">2개</strong></div>
+        `;
+      }
+    }
+
+    function renderStep4View() {
+      const rx = reactions[state.reactionMode];
+      const pContainer = document.getElementById('step4ParticleView');
+
+      if (state.reactionMode === 'precipitate') {
+        pContainer.innerHTML = `
+          <div class="bg-amber-50/60 border border-amber-200 p-4 rounded-2xl space-y-3">
+            <h3 class="font-bold text-amber-900 text-sm">◀ 반응물 계 입자 모형 (반응 전: NaCl + AgNO₃)</h3>
+            <div class="bg-slate-900 p-4 rounded-xl min-h-[160px] flex items-center justify-center flex-wrap gap-2 text-white">
+              <div class="flex flex-col items-center">
+                <span class="text-[10px] text-amber-300 font-bold mb-1">NaCl (1개)</span>
+                ${getParticleSVG('NaCl')}
+              </div>
+              <span class="text-2xl font-black text-amber-400 mx-2">+</span>
+              <div class="flex flex-col items-center">
+                <span class="text-[10px] text-amber-300 font-bold mb-1">AgNO₃ (1개)</span>
+                ${getParticleSVG('AgNO3')}
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-emerald-50/60 border border-emerald-200 p-4 rounded-2xl space-y-3">
+            <h3 class="font-bold text-emerald-900 text-sm">생성물 계 입자 모형 (반응 후: AgCl + NaNO₃) ▶</h3>
+            <div class="bg-slate-900 p-4 rounded-xl min-h-[160px] flex items-center justify-center flex-wrap gap-2 text-white">
+              <div class="flex flex-col items-center">
+                <span class="text-[10px] text-emerald-300 font-bold mb-1">AgCl (1개)</span>
+                ${getParticleSVG('AgCl')}
+              </div>
+              <span class="text-2xl font-black text-emerald-400 mx-2">+</span>
+              <div class="flex flex-col items-center">
+                <span class="text-[10px] text-emerald-300 font-bold mb-1">NaNO₃ (1개)</span>
+                ${getParticleSVG('NaNO3')}
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        pContainer.innerHTML = `
+          <div class="bg-amber-50/60 border border-amber-200 p-4 rounded-2xl space-y-3">
+            <h3 class="font-bold text-amber-900 text-sm">◀ 반응물 계 입자 모형 (반응 전: CaCO₃ + 2 HCl)</h3>
+            <div class="bg-slate-900 p-4 rounded-xl min-h-[160px] flex items-center justify-center flex-wrap gap-2 text-white">
+              <div class="flex flex-col items-center">
+                <span class="text-[10px] text-amber-300 font-bold mb-1">CaCO₃ (1개)</span>
+                ${getParticleSVG('CaCO3')}
+              </div>
+              <span class="text-2xl font-black text-amber-400 mx-1">+</span>
+              <div class="flex flex-col items-center">
+                <span class="text-[10px] text-amber-300 font-bold mb-1">2 HCl (2개 분자)</span>
+                <div class="flex space-x-1">
+                  ${getParticleSVG('HCl')}
+                  ${getParticleSVG('HCl')}
                 </div>
+              </div>
             </div>
+          </div>
 
-            <!-- Controls -->
-            <div class="flex items-center justify-between gap-4">
-                <button onclick="app.prevCard()" class="w-14 h-14 rounded-full bg-white text-slate-600 shadow-md hover:bg-slate-50 flex items-center justify-center transition-colors">
-                    <i class="fa-solid fa-chevron-left text-xl"></i>
+          <div class="bg-emerald-50/60 border border-emerald-200 p-4 rounded-2xl space-y-3">
+            <h3 class="font-bold text-emerald-900 text-sm">생성물 계 입자 모형 (반응 후: CaCl₂ + CO₂ + H₂O) ▶</h3>
+            <div class="bg-slate-900 p-4 rounded-xl min-h-[160px] flex items-center justify-center flex-wrap gap-2 text-white">
+              <div class="flex flex-col items-center">
+                <span class="text-[10px] text-emerald-300 font-bold mb-1">CaCl₂</span>
+                ${getParticleSVG('CaCl2')}
+              </div>
+              <span class="text-xl font-black text-emerald-400">+</span>
+              <div class="flex flex-col items-center">
+                <span class="text-[10px] text-emerald-300 font-bold mb-1">CO₂</span>
+                ${getParticleSVG('CO2')}
+              </div>
+              <span class="text-xl font-black text-emerald-400">+</span>
+              <div class="flex flex-col items-center">
+                <span class="text-[10px] text-emerald-300 font-bold mb-1">H₂O</span>
+                ${getParticleSVG('H2O')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      const tableBody = document.getElementById('verifyTableBody');
+      tableBody.innerHTML = rx.elements.map(elem => {
+        const userChoice = state.step4.userChoices[elem.sym];
+        const isMatchChosen = userChoice === 'yes';
+        const isMismatchChosen = userChoice === 'no';
+
+        return `
+          <tr>
+            <td class="p-2.5 font-bold">${elem.name}</td>
+            <td class="p-2 font-mono"><span class="${elem.color} px-2 py-0.5 rounded-full font-bold">${elem.sym}</span></td>
+            <td class="p-2 bg-amber-50/50 font-bold text-amber-900">${elem.countReact}개</td>
+            <td class="p-2 bg-emerald-50/50 font-bold text-emerald-900">${elem.countProd}개</td>
+            <td class="p-2">
+              <div class="flex items-center justify-center space-x-2">
+                <button onclick="setUserStep4Choice('${elem.sym}', 'yes')" 
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                          isMatchChosen 
+                            ? 'bg-emerald-600 text-white ring-2 ring-emerald-400 shadow-md' 
+                            : 'bg-slate-200 hover:bg-emerald-100 text-slate-700'
+                        }">
+                  일치한다
                 </button>
-
-                <div class="flex-grow flex gap-3">
-                    <button onclick="app.markCard(false)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-4 rounded-2xl shadow-sm border border-rose-200 transition-all flex flex-col items-center justify-center gap-1 active:scale-95">
-                        <i class="fa-regular fa-face-frown text-2xl"></i>
-                        <span class="text-sm">몰라요</span>
-                    </button>
-                    <button onclick="app.markCard(true)" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 font-bold py-4 rounded-2xl shadow-sm border border-emerald-200 transition-all flex flex-col items-center justify-center gap-1 active:scale-95">
-                        <i class="fa-regular fa-face-smile text-2xl"></i>
-                        <span class="text-sm">알아요</span>
-                    </button>
-                </div>
-
-                <button onclick="app.nextCard()" class="w-14 h-14 rounded-full bg-white text-slate-600 shadow-md hover:bg-slate-50 flex items-center justify-center transition-colors">
-                    <i class="fa-solid fa-chevron-right text-xl"></i>
+                <button onclick="setUserStep4Choice('${elem.sym}', 'no')" 
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                          isMismatchChosen 
+                            ? 'bg-rose-600 text-white ring-2 ring-rose-400 shadow-md' 
+                            : 'bg-slate-200 hover:bg-rose-100 text-slate-700'
+                        }">
+                  일치하지 않는다
                 </button>
+              </div>
+              <div id="choiceMsg_${elem.sym}" class="text-[11px] font-bold mt-1">
+                ${isMatchChosen ? '<span class="text-emerald-600">✅ 정답 (반응 전후 원자 수가 보존됩니다)</span>' : ''}
+                ${isMismatchChosen ? '<span class="text-rose-600">❌ 오답 (입자 모형의 개수를 다시 비교해 보세요)</span>' : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      checkStep4Completion();
+    }
+
+    function setUserStep4Choice(sym, choice) {
+      state.step4.userChoices[sym] = choice;
+      if (choice === 'no') {
+        state.hintCount++;
+      }
+      saveState();
+      renderStep4View();
+    }
+
+    function checkStep4Completion() {
+      const rx = reactions[state.reactionMode];
+      const allCorrect = rx.elements.every(e => state.step4.userChoices[e.sym] === 'yes');
+
+      const nextBtn = document.getElementById('step4NextBtn');
+      const banner = document.getElementById('verifySuccessBanner');
+
+      if (allCorrect) {
+        banner.classList.remove('hidden');
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        banner.classList.add('hidden');
+        nextBtn.disabled = true;
+        nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function renderStep5View() {
+      const isGasMode = state.reactionMode === 'gas';
+      
+      const titleHeader = document.getElementById('step5TitleHeader');
+      const subHeader = document.getElementById('step5SubHeader');
+      const modeBadge = document.getElementById('step5ModeBadge');
+
+      if (isGasMode) {
+        titleHeader.textContent = "기체 발생 반응 계수 조정 연습 (메테인 연소 기체 발생)";
+        subHeader.textContent = "메테인(CH₄) 기체가 산소(O₂)와 반응하여 이산화 탄소(CO₂) 기체와 물(H₂O)을 생성하는 계수를 조정하세요.";
+        modeBadge.textContent = "🫧 기체 발생 반응 예시 (CH₄ + O₂ → CO₂ + H₂O)";
+        modeBadge.className = "text-xs font-bold px-3 py-1 bg-cyan-100 text-cyan-900 rounded-full";
+      } else {
+        titleHeader.textContent = "앙금 생성 연관 계수 조정 연습 (수소와 산소의 물 합성)";
+        subHeader.textContent = "수소 기체와 산소 기체가 반응하여 물 분자를 생성하는 반응식의 계수를 조정해 보세요.";
+        modeBadge.textContent = "🧪 기본 계수 연습 (H₂ + O₂ → H₂O)";
+        modeBadge.className = "text-xs font-bold px-3 py-1 bg-indigo-100 text-indigo-900 rounded-full";
+      }
+
+      renderStep5Controls();
+      updateStep5UI();
+    }
+
+    function renderStep5Controls() {
+      const eqControls = document.getElementById('step5EquationControls');
+      const counterMatrix = document.getElementById('step5CounterMatrix');
+
+      if (state.reactionMode === 'gas') {
+        // Gas mode: CH4 + O2 -> CO2 + H2O
+        const c = state.step5.gas;
+        eqControls.innerHTML = `
+          <!-- CH4 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center space-x-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
+              <button onclick="adjustCoeff('CH4', -1)" class="w-7 h-7 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold text-indigo-300">-</button>
+              <span class="w-6 text-center text-yellow-400 font-bold text-lg">${c.coeffCH4}</span>
+              <button onclick="adjustCoeff('CH4', 1)" class="w-7 h-7 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold text-indigo-300">+</button>
             </div>
-            <div class="text-center mt-6 text-xs text-slate-400">
-                스페이스바로 뒤집기, 방향키(←, →)로 이동할 수 있습니다.
+            <span class="text-xs mt-1 text-slate-300">CH<sub>4</sub></span>
+          </div>
+
+          <span class="text-slate-400">+</span>
+
+          <!-- O2 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center space-x-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
+              <button onclick="adjustCoeff('O2', -1)" class="w-7 h-7 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold text-indigo-300">-</button>
+              <span class="w-6 text-center text-yellow-400 font-bold text-lg">${c.coeffO2}</span>
+              <button onclick="adjustCoeff('O2', 1)" class="w-7 h-7 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold text-indigo-300">+</button>
             </div>
-        </section>
+            <span class="text-xs mt-1 text-slate-300">O<sub>2</sub></span>
+          </div>
 
-        <section id="screen-test" class="screen w-full w-full max-w-md">
-            <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden relative">
-                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                    <span class="text-sm font-bold text-slate-500">주관식 테스트</span>
-                    <span class="text-sm font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full" id="test-progress-text">1 / 10</span>
-                </div>
-                
-                <div class="p-6 sm:p-8 flex flex-col items-center text-center">
-                    <div id="test-question-type" class="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded-md mb-4 inline-block">화학식 입력</div>
-                    <div id="test-question-text" class="text-3xl sm:text-4xl font-bold text-slate-800 mb-8 break-keep min-h-[3rem]">문제</div>
-                    
-                    <form id="test-form" class="w-full relative" onsubmit="app.submitTestAnswer(event)">
-                        <input type="text" id="test-input" class="w-full text-center text-2xl font-bold p-4 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all" 
-                               autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="정답을 입력하세요">
-                        <p class="text-xs text-slate-400 mt-2 text-left px-1">* 대소문자를 구분해서 입력하세요 (숫자/기호는 자동으로 위·아래첨자로 변환됩니다)</p>
-                        
-                        <button type="submit" id="btn-submit-test" class="mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all text-lg">
-                            제출하기
-                        </button>
-                    </form>
+          <span class="text-slate-400">→</span>
 
-                    <!-- Feedback Area (Hidden by default) -->
-                    <div id="test-feedback" class="w-full mt-6 hidden fade-in text-left">
-                        <div id="feedback-box" class="p-4 rounded-xl border-2 flex items-start gap-3">
-                            <div id="feedback-icon" class="text-2xl mt-0.5"></div>
-                            <div class="flex-grow">
-                                <h4 id="feedback-title" class="font-bold text-lg mb-1">정답입니다!</h4>
-                                <p id="feedback-detail" class="text-sm font-medium"></p>
-                            </div>
-                        </div>
-                        <button id="btn-next-test" onclick="app.nextTestQuestion()" class="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl shadow-md transition-all">
-                            다음 문제
-                        </button>
-                    </div>
-                </div>
+          <!-- CO2 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center space-x-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
+              <button onclick="adjustCoeff('CO2', -1)" class="w-7 h-7 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold text-indigo-300">-</button>
+              <span class="w-6 text-center text-yellow-400 font-bold text-lg">${c.coeffCO2}</span>
+              <button onclick="adjustCoeff('CO2', 1)" class="w-7 h-7 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold text-indigo-300">+</button>
             </div>
-        </section>
+            <span class="text-xs mt-1 text-slate-300">CO<sub>2</sub></span>
+          </div>
 
-        <section id="screen-result" class="screen w-full w-full max-w-md">
-            <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden flex flex-col h-[80vh] max-h-[600px]">
-                <div class="p-6 sm:p-8 border-b border-slate-100 text-center bg-gradient-to-br from-blue-50 to-purple-50">
-                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-md text-3xl">
-                        <span id="result-emoji">🎉</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">학습 완료!</h2>
-                    <div class="text-sm font-medium text-slate-500 mb-4" id="result-subtitle">테스트 결과를 확인하세요</div>
-                    
-                    <div id="score-display" class="hidden text-4xl font-black text-blue-600 mb-2">
-                        <span id="score-correct">0</span> <span class="text-xl text-slate-400 font-bold">/ <span id="score-total">0</span></span>
-                    </div>
-                </div>
+          <span class="text-slate-400">+</span>
 
-                <div class="flex-grow overflow-y-auto p-4 sm:p-6 bg-slate-50">
-                    <h3 class="text-sm font-bold text-slate-700 mb-3" id="result-list-title">틀린 문제 목록</h3>
-                    <ul id="mistakes-list" class="space-y-3">
-                        <!-- Mistakes will be injected here -->
-                    </ul>
-                    <div id="perfect-message" class="hidden text-center py-8 text-emerald-600 font-bold flex flex-col items-center">
-                        <i class="fa-solid fa-award text-4xl mb-2"></i>
-                        모두 맞췄습니다! 완벽해요!
-                    </div>
-                </div>
-
-                <div class="p-4 sm:p-6 bg-white border-t border-slate-100 flex gap-3">
-                    <button onclick="app.goHome()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl transition-all text-sm">
-                        홈으로
-                    </button>
-                    <button id="btn-retry-mistakes" onclick="app.start(app.currentMode, true)" class="flex-[2] bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold py-3.5 rounded-xl shadow-md transition-all text-sm hidden">
-                        틀린 것만 재학습
-                    </button>
-                </div>
+          <!-- H2O -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center space-x-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
+              <button onclick="adjustCoeff('H2O', -1)" class="w-7 h-7 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold text-indigo-300">-</button>
+              <span class="w-6 text-center text-yellow-400 font-bold text-lg">${c.coeffH2O}</span>
+              <button onclick="adjustCoeff('H2O', 1)" class="w-7 h-7 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold text-indigo-300">+</button>
             </div>
-        </section>
+            <span class="text-xs mt-1 text-slate-300">H<sub>2</sub>O</span>
+          </div>
+        `;
 
-    </main>
+        counterMatrix.innerHTML = `
+          <div class="grid grid-cols-3 text-center py-1.5 items-center">
+            <span class="text-amber-400 font-bold">탄소 (C)</span>
+            <span id="cntCReact" class="font-bold">1개</span>
+            <span id="cntCProd" class="font-bold">1개</span>
+          </div>
+          <div class="grid grid-cols-3 text-center py-1.5 items-center">
+            <span class="text-cyan-400 font-bold">수소 (H)</span>
+            <span id="cntHReact" class="font-bold">4개</span>
+            <span id="cntHProd" class="font-bold">2개</span>
+          </div>
+          <div class="grid grid-cols-3 text-center py-1.5 items-center">
+            <span class="text-red-400 font-bold">산소 (O)</span>
+            <span id="cntOReact" class="font-bold">2개</span>
+            <span id="cntOProd" class="font-bold">3개</span>
+          </div>
+        `;
 
-    <script>
-        // Data Configuration
-        const RAW_DATA = {
-            elements: [
-                { ko: '수소', symbol: 'H' },
-                { ko: '리튬', symbol: 'Li' },
-                { ko: '탄소', symbol: 'C' },
-                { ko: '질소', symbol: 'N' },
-                { ko: '산소', symbol: 'O' },
-                { ko: '나트륨', symbol: 'Na' },
-                { ko: '마그네슘', symbol: 'Mg' },
-                { ko: '알루미늄', symbol: 'Al' },
-                { ko: '황', symbol: 'S' },
-                { ko: '염소', symbol: 'Cl' },
-                { ko: '칼슘', symbol: 'Ca' },
-                { ko: '칼륨', symbol: 'K' },
-                { ko: '구리', symbol: 'Cu' },
-                { ko: '은', symbol: 'Ag' },
-                { ko: '질산 이온', symbol: 'NO₃⁻' },
-                { ko: '탄산 이온', symbol: 'CO₃²⁻' }
-            ],
-            formulas: [
-                { ko: '수소(기체)', symbol: 'H₂' },
-                { ko: '산소(기체)', symbol: 'O₂' },
-                { ko: '질소(기체)', symbol: 'N₂' },
-                { ko: '이산화 탄소', symbol: 'CO₂' },
-                { ko: '이산화 질소', symbol: 'NO₂' },
-                { ko: '염화 칼슘', symbol: 'CaCl₂' },
-                { ko: '탄산 칼슘', symbol: 'CaCO₃' },
-                { ko: '염화 나트륨', symbol: 'NaCl' },
-                { ko: '물', symbol: 'H₂O' },
-                { ko: '염산', symbol: 'HCl' },
-                { ko: '암모니아', symbol: 'NH₃' },
-                { ko: '메테인', symbol: 'CH₄' },
-                { ko: '산화 구리', symbol: 'CuO' },
-                { ko: '산화 마그네슘', symbol: 'MgO' },
-                { ko: '염화 마그네슘', symbol: 'MgCl₂' },
-                { ko: '질산은', symbol: 'AgNO₃' }
-            ]
-        };
+      } else {
+        // Precipitate/Default mode: H2 + O2 -> H2O
+        const c = state.step5.precipitate;
+        eqControls.innerHTML = `
+          <!-- H2 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center space-x-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
+              <button onclick="adjustCoeff('H2', -1)" class="w-8 h-8 bg-slate-700 hover:bg-slate-600 rounded-lg text-lg font-bold text-indigo-300">-</button>
+              <span class="w-8 text-center text-yellow-400 font-bold text-xl">${c.coeffH2}</span>
+              <button onclick="adjustCoeff('H2', 1)" class="w-8 h-8 bg-slate-700 hover:bg-slate-600 rounded-lg text-lg font-bold text-indigo-300">+</button>
+            </div>
+            <span class="text-xs mt-1 text-slate-300">H<sub>2</sub></span>
+          </div>
 
-        const utils = {
-            shuffle: (array) => {
-                let currentIndex = array.length, randomIndex;
-                while (currentIndex > 0) {
-                    randomIndex = Math.floor(Math.random() * currentIndex);
-                    currentIndex--;
-                    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-                }
-                return array;
-            },
-            
-            // Convert standard typed text (e.g. H2O, CO32-) to compare with Unicode sub/superscripts
-            normalizeFormula: (str) => {
-                const map = { 
-                    '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
-                    '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9',
-                    '⁻': '-', '²': '2', '³': '3', '⁺': '+' 
-                };
-                let normalized = str;
-                for (const [key, value] of Object.entries(map)) {
-                    normalized = normalized.split(key).join(value);
-                }
-                return normalized.trim();
-            },
+          <span class="text-slate-400">+</span>
 
-            // Convert raw input into chemical formula formatting dynamically
-            formatChemical: (str) => {
-                let res = str;
-                // Superscripts (charges)
-                res = res.replace(/2-/g, '²⁻');
-                res = res.replace(/3-/g, '³⁻');
-                res = res.replace(/2\+/g, '²⁺');
-                res = res.replace(/-/g, '⁻');
-                res = res.replace(/\+/g, '⁺');
-                
-                // Subscripts (remaining numbers)
-                const subMap = {
-                    '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄',
-                    '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉'
-                };
-                res = res.replace(/[0-9]/g, m => subMap[m]);
-                return res;
-            },
-            
-            normalizeKorean: (str) => {
-                // Remove spaces and parenthetical parts for flexible comparison if needed, 
-                // but prompt says "strict case". For Korean, we'll just strip spaces.
-                return str.replace(/\s/g, '').replace(/\(.*?\)/g, '');
-            },
+          <!-- O2 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center space-x-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
+              <button onclick="adjustCoeff('O2', -1)" class="w-8 h-8 bg-slate-700 hover:bg-slate-600 rounded-lg text-lg font-bold text-indigo-300">-</button>
+              <span class="w-8 text-center text-yellow-400 font-bold text-xl">${c.coeffO2}</span>
+              <button onclick="adjustCoeff('O2', 1)" class="w-8 h-8 bg-slate-700 hover:bg-slate-600 rounded-lg text-lg font-bold text-indigo-300">+</button>
+            </div>
+            <span class="text-xs mt-1 text-slate-300">O<sub>2</sub></span>
+          </div>
 
-            checkAnswer: (userAns, correctAns, isAnswerKorean) => {
-                if (isAnswerKorean) {
-                    return utils.normalizeKorean(userAns) === utils.normalizeKorean(correctAns);
-                } else {
-                    return utils.normalizeFormula(userAns) === utils.normalizeFormula(correctAns);
-                }
-            }
-        };
+          <span class="text-slate-400">→</span>
 
-        const app = {
-            settings: { category: 'all', direction: 'ko2en' },
-            currentMode: null, // 'flashcard' | 'test'
-            deck: [],
-            currentIndex: 0,
-            unknownItems: new Set(),
-            testResults: [], // { card, isCorrect, userAnswer }
-            isFlipped: false,
-            
-            // DOM Elements
-            screens: {
-                home: document.getElementById('screen-home'),
-                flashcard: document.getElementById('screen-flashcard'),
-                test: document.getElementById('screen-test'),
-                result: document.getElementById('screen-result')
-            },
+          <!-- H2O -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center space-x-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
+              <button onclick="adjustCoeff('H2O', -1)" class="w-8 h-8 bg-slate-700 hover:bg-slate-600 rounded-lg text-lg font-bold text-indigo-300">-</button>
+              <span class="w-8 text-center text-yellow-400 font-bold text-xl">${c.coeffH2O}</span>
+              <button onclick="adjustCoeff('H2O', 1)" class="w-8 h-8 bg-slate-700 hover:bg-slate-600 rounded-lg text-lg font-bold text-indigo-300">+</button>
+            </div>
+            <span class="text-xs mt-1 text-slate-300">H<sub>2</sub>O</span>
+          </div>
+        `;
 
-            init: function() {
-                this.setupEventListeners();
-                this.updateHomeUI();
-            },
+        counterMatrix.innerHTML = `
+          <div class="grid grid-cols-3 text-center py-2 items-center">
+            <span class="text-cyan-400 font-bold">수소 (H)</span>
+            <span id="cntHReact" class="font-bold">2개</span>
+            <span id="cntHProd" class="font-bold">2개</span>
+          </div>
+          <div class="grid grid-cols-3 text-center py-2 items-center">
+            <span class="text-red-400 font-bold">산소 (O)</span>
+            <span id="cntOReact" class="font-bold">2개</span>
+            <span id="cntOProd" class="font-bold">1개</span>
+          </div>
+        `;
+      }
+    }
 
-            setupEventListeners: function() {
-                // Home Configuration buttons
-                document.querySelectorAll('.category-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        document.querySelectorAll('.category-btn').forEach(b => {
-                            b.classList.remove('active', 'border-blue-500', 'bg-blue-50', 'text-blue-700');
-                            b.classList.add('border-slate-200', 'bg-white', 'text-slate-600');
-                        });
-                        const target = e.currentTarget;
-                        target.classList.remove('border-slate-200', 'bg-white', 'text-slate-600');
-                        target.classList.add('active', 'border-blue-500', 'bg-blue-50', 'text-blue-700');
-                        this.settings.category = target.dataset.value;
-                    });
-                });
+    function adjustCoeff(molecule, delta) {
+      if (state.reactionMode === 'gas') {
+        const c = state.step5.gas;
+        const key = `coeff${molecule}`;
+        c[key] = Math.max(1, Math.min(5, c[key] + delta));
+      } else {
+        const c = state.step5.precipitate;
+        const key = `coeff${molecule}`;
+        c[key] = Math.max(1, Math.min(5, c[key] + delta));
+      }
+      saveState();
+      renderStep5Controls();
+      updateStep5UI();
+    }
 
-                document.querySelectorAll('.direction-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        document.querySelectorAll('.direction-btn').forEach(b => {
-                            b.classList.remove('active', 'border-purple-500', 'bg-purple-50', 'text-purple-700');
-                            b.classList.add('border-slate-200', 'bg-white', 'text-slate-600');
-                        });
-                        const target = e.currentTarget;
-                        target.classList.remove('border-slate-200', 'bg-white', 'text-slate-600');
-                        target.classList.add('active', 'border-purple-500', 'bg-purple-50', 'text-purple-700');
-                        this.settings.direction = target.dataset.value;
-                    });
-                });
+    function updateStep5UI() {
+      const visReactants = document.getElementById('visReactants');
+      const visProducts = document.getElementById('visProducts');
+      const statusBox = document.getElementById('coeffStatus');
+      const nextBtn = document.getElementById('step5NextBtn');
 
-                // Global Keyboard Listeners
-                document.addEventListener('keydown', (e) => {
-                    if (this.currentMode === 'flashcard') {
-                        if (e.code === 'Space') {
-                            e.preventDefault();
-                            this.flipCard();
-                        } else if (e.code === 'ArrowLeft') {
-                            e.preventDefault();
-                            this.prevCard();
-                        } else if (e.code === 'ArrowRight') {
-                            e.preventDefault();
-                            this.nextCard();
-                        }
-                    }
-                });
+      visReactants.innerHTML = '';
+      visProducts.innerHTML = '';
 
-                // Auto-format Chemical Formulas in Test Input
-                document.getElementById('test-input').addEventListener('input', (e) => {
-                    if (this.currentMode === 'test' && this.deck.length > 0) {
-                        const card = this.deck[this.currentIndex];
-                        const isKoreanAns = card.direction === 'en2ko';
-                        
-                        // 정답이 화학식/기호인 경우에만 자동 변환 적용
-                        if (!isKoreanAns) {
-                            const input = e.target;
-                            const start = input.selectionStart;
-                            const end = input.selectionEnd;
-                            const oldVal = input.value;
-                            
-                            const raw = utils.normalizeFormula(oldVal);
-                            const newVal = utils.formatChemical(raw);
-                            
-                            if (oldVal !== newVal) {
-                                input.value = newVal;
-                                // 커서 위치 복구 (변환 후에도 글자 수가 같아 자연스럽게 타이핑 가능)
-                                input.setSelectionRange(start, end);
-                            }
-                        }
-                    }
-                });
-            },
+      if (state.reactionMode === 'gas') {
+        const { coeffCH4, coeffO2, coeffCO2, coeffH2O } = state.step5.gas;
 
-            updateHomeUI: function() {
-                const btnUnknown = document.getElementById('btn-study-unknown');
-                if (this.unknownItems.size > 0) {
-                    btnUnknown.classList.remove('hidden');
-                    btnUnknown.classList.add('flex');
-                    document.getElementById('unknown-count').innerText = this.unknownItems.size;
-                } else {
-                    btnUnknown.classList.add('hidden');
-                    btnUnknown.classList.remove('flex');
-                }
-            },
+        const cReact = coeffCH4 * 1;
+        const hReact = coeffCH4 * 4;
+        const oReact = coeffO2 * 2;
 
-            showScreen: function(screenName) {
-                Object.values(this.screens).forEach(s => s.classList.remove('active'));
-                this.screens[screenName].classList.add('active');
-                
-                document.getElementById('header-controls').classList.toggle('hidden', screenName === 'home');
-                document.getElementById('progress-container').classList.toggle('hidden', screenName === 'home' || screenName === 'result');
-                
-                if(screenName === 'home') document.getElementById('progress-bar').style.width = '0%';
-            },
+        const cProd = coeffCO2 * 1;
+        const hProd = coeffH2O * 2;
+        const oProd = (coeffCO2 * 2) + (coeffH2O * 1);
 
-            buildDeck: function(useUnknownOnly) {
-                let rawList = [];
-                if (useUnknownOnly) {
-                    rawList = Array.from(this.unknownItems);
-                } else {
-                    if (this.settings.category === 'element' || this.settings.category === 'all') {
-                        rawList = rawList.concat(RAW_DATA.elements.map(item => ({...item, type: 'element'})));
-                    }
-                    if (this.settings.category === 'formula' || this.settings.category === 'all') {
-                        rawList = rawList.concat(RAW_DATA.formulas.map(item => ({...item, type: 'formula'})));
-                    }
-                }
+        document.getElementById('cntCReact').textContent = `${cReact}개`;
+        document.getElementById('cntCProd').textContent = `${cProd}개`;
+        document.getElementById('cntHReact').textContent = `${hReact}개`;
+        document.getElementById('cntHProd').textContent = `${hProd}개`;
+        document.getElementById('cntOReact').textContent = `${oReact}개`;
+        document.getElementById('cntOProd').textContent = `${oProd}개`;
 
-                let generatedDeck = rawList.map(item => {
-                    let dir = this.settings.direction;
-                    if (dir === 'mixed') dir = Math.random() > 0.5 ? 'ko2en' : 'en2ko';
-                    
-                    return {
-                        original: item,
-                        direction: dir,
-                        front: dir === 'ko2en' ? item.ko : item.symbol,
-                        back: dir === 'ko2en' ? item.symbol : item.ko,
-                        frontLabel: dir === 'ko2en' ? '한글' : (item.type === 'element' ? '원소기호' : '화학식'),
-                        backLabel: dir === 'ko2en' ? (item.type === 'element' ? '원소기호' : '화학식') : '한글',
-                    };
-                });
+        // Render CH4 particles
+        for (let i = 0; i < coeffCH4; i++) {
+          visReactants.innerHTML += `
+            <div class="border border-amber-800 bg-amber-950/70 p-1.5 rounded-xl flex items-center space-x-1">
+              <span class="text-[10px] text-amber-400 font-mono font-bold">CH₄:</span>
+              <svg viewBox="0 0 50 50" class="w-10 h-10">
+                <circle cx="25" cy="25" r="12" fill="#eab308"/>
+                <text x="25" y="28" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">C</text>
+                <circle cx="25" cy="8" r="6" fill="#06b6d4"/><circle cx="25" cy="42" r="6" fill="#06b6d4"/>
+                <circle cx="8" cy="25" r="6" fill="#06b6d4"/><circle cx="42" cy="25" r="6" fill="#06b6d4"/>
+              </svg>
+            </div>
+          `;
+        }
+        // Render O2 particles
+        for (let i = 0; i < coeffO2; i++) {
+          visReactants.innerHTML += `
+            <div class="border border-red-800 bg-red-950/70 p-1.5 rounded-xl flex items-center space-x-1">
+              <span class="text-[10px] text-red-400 font-mono font-bold">O₂:</span>
+              <svg viewBox="0 0 44 24" class="w-9 h-5">
+                <circle cx="12" cy="12" r="9" fill="#ef4444"/><text x="12" y="15" font-size="7" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+                <circle cx="32" cy="12" r="9" fill="#ef4444"/><text x="32" y="15" font-size="7" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+              </svg>
+            </div>
+          `;
+        }
 
-                return utils.shuffle(generatedDeck);
-            },
+        // Render CO2 particles
+        for (let i = 0; i < coeffCO2; i++) {
+          visProducts.innerHTML += `
+            <div class="border border-yellow-800 bg-yellow-950/70 p-1.5 rounded-xl flex items-center space-x-1">
+              <span class="text-[10px] text-yellow-400 font-mono font-bold">CO₂:</span>
+              ${getParticleSVG('CO2')}
+            </div>
+          `;
+        }
+        // Render H2O particles
+        for (let i = 0; i < coeffH2O; i++) {
+          visProducts.innerHTML += `
+            <div class="border border-emerald-800 bg-emerald-950/70 p-1.5 rounded-xl flex items-center space-x-1">
+              <span class="text-[10px] text-emerald-400 font-mono font-bold">H₂O:</span>
+              ${getParticleSVG('H2O')}
+            </div>
+          `;
+        }
 
-            updateProgress: function() {
-                const progressTextId = this.currentMode === 'flashcard' ? 'fc-progress-text' : 'test-progress-text';
-                const el = document.getElementById(progressTextId);
-                if (el) {
-                    el.innerText = `${this.currentIndex + 1} / ${this.deck.length}`;
-                }
-                const pct = ((this.currentIndex + 1) / this.deck.length) * 100;
-                document.getElementById('progress-bar').style.width = `${pct}%`;
-            },
+        if (cReact === cProd && hReact === hProd && oReact === oProd) {
+          statusBox.className = 'text-xs font-bold p-3 rounded-xl w-full md:w-auto flex-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+          statusBox.textContent = '🎉 정답입니다! (1 CH₄ + 2 O₂ → 1 CO₂ + 2 H₂O) 모든 원자 수가 완벽하게 맞습니다.';
+          nextBtn.disabled = false;
+          nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+          statusBox.className = 'text-xs font-bold p-3 rounded-xl w-full md:w-auto flex-1 bg-amber-500/20 text-amber-300 border border-amber-500/30';
+          statusBox.textContent = `⚠️ 수가 일치하지 않습니다 (C: ${cReact}vs${cProd}, H: ${hReact}vs${hProd}, O: ${oReact}vs${oProd})`;
+          nextBtn.disabled = true;
+          nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
 
-            start: function(mode, useUnknownOnly = false) {
-                this.currentMode = mode;
-                this.deck = this.buildDeck(useUnknownOnly);
-                this.currentIndex = 0;
-                
-                if (this.deck.length === 0) {
-                    alert('학습할 데이터가 없습니다.');
-                    return;
-                }
+      } else {
+        const { coeffH2, coeffO2, coeffH2O } = state.step5.precipitate;
 
-                if (mode === 'flashcard') {
-                    this.isFlipped = false;
-                    document.getElementById('flashcard-inner').classList.remove('rotate-y-180');
-                    this.renderFlashcard();
-                    this.showScreen('flashcard');
-                } else if (mode === 'test') {
-                    this.testResults = [];
-                    // Reset unknown items specifically for full test? No, let's just accumulate or modify.
-                    if(!useUnknownOnly) this.unknownItems.clear(); 
-                    this.renderTest();
-                    this.showScreen('test');
-                }
-            },
+        const hReact = coeffH2 * 2;
+        const oReact = coeffO2 * 2;
+        const hProd = coeffH2O * 2;
+        const oProd = coeffH2O * 1;
 
-            renderFlashcard: function() {
-                if (this.currentIndex >= this.deck.length) {
-                    this.finishStudy();
-                    return;
-                }
-                
-                const card = this.deck[this.currentIndex];
-                document.getElementById('fc-front-text').innerHTML = card.front;
-                document.getElementById('fc-back-text').innerHTML = card.back;
-                document.getElementById('fc-type-front').innerText = card.frontLabel;
-                document.getElementById('fc-type-back').innerText = card.backLabel;
-                
-                this.isFlipped = false;
-                document.getElementById('flashcard-inner').classList.remove('rotate-y-180');
-                this.updateProgress();
-            },
+        document.getElementById('cntHReact').textContent = `${hReact}개`;
+        document.getElementById('cntHProd').textContent = `${hProd}개`;
+        document.getElementById('cntOReact').textContent = `${oReact}개`;
+        document.getElementById('cntOProd').textContent = `${oProd}개`;
 
-            flipCard: function() {
-                this.isFlipped = !this.isFlipped;
-                const inner = document.getElementById('flashcard-inner');
-                if (this.isFlipped) {
-                    inner.classList.add('rotate-y-180');
-                } else {
-                    inner.classList.remove('rotate-y-180');
-                }
-            },
+        for (let i = 0; i < coeffH2; i++) {
+          visReactants.innerHTML += `
+            <div class="border border-cyan-800 bg-cyan-950/70 p-1.5 rounded-xl flex items-center space-x-1">
+              <span class="text-[10px] text-cyan-400 font-mono font-bold">H₂:</span>
+              <svg viewBox="0 0 44 24" class="w-9 h-5">
+                <circle cx="12" cy="12" r="9" fill="#06b6d4"/><text x="12" y="15" font-size="7" font-weight="bold" fill="#ffffff" text-anchor="middle">H</text>
+                <circle cx="32" cy="12" r="9" fill="#06b6d4"/><text x="32" y="15" font-size="7" font-weight="bold" fill="#ffffff" text-anchor="middle">H</text>
+              </svg>
+            </div>
+          `;
+        }
+        for (let i = 0; i < coeffO2; i++) {
+          visReactants.innerHTML += `
+            <div class="border border-red-800 bg-red-950/70 p-1.5 rounded-xl flex items-center space-x-1">
+              <span class="text-[10px] text-red-400 font-mono font-bold">O₂:</span>
+              <svg viewBox="0 0 44 24" class="w-9 h-5">
+                <circle cx="12" cy="12" r="9" fill="#ef4444"/><text x="12" y="15" font-size="7" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+                <circle cx="32" cy="12" r="9" fill="#ef4444"/><text x="32" y="15" font-size="7" font-weight="bold" fill="#ffffff" text-anchor="middle">O</text>
+              </svg>
+            </div>
+          `;
+        }
 
-            nextCard: function() {
-                if (this.currentIndex < this.deck.length - 1) {
-                    this.currentIndex++;
-                    this.renderFlashcard();
-                } else {
-                    this.finishStudy();
-                }
-            },
+        for (let i = 0; i < coeffH2O; i++) {
+          visProducts.innerHTML += `
+            <div class="border border-emerald-800 bg-emerald-950/70 p-1.5 rounded-xl flex items-center space-x-1">
+              <span class="text-[10px] text-emerald-400 font-mono font-bold">H₂O:</span>
+              ${getParticleSVG('H2O')}
+            </div>
+          `;
+        }
 
-            prevCard: function() {
-                if (this.currentIndex > 0) {
-                    this.currentIndex--;
-                    this.renderFlashcard();
-                }
-            },
+        if (hReact === hProd && oReact === oProd) {
+          statusBox.className = 'text-xs font-bold p-3 rounded-xl w-full md:w-auto flex-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+          statusBox.textContent = '🎉 정답입니다! (2 H₂ + 1 O₂ → 2 H₂O) 모든 원자 수가 일치합니다.';
+          nextBtn.disabled = false;
+          nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+          statusBox.className = 'text-xs font-bold p-3 rounded-xl w-full md:w-auto flex-1 bg-amber-500/20 text-amber-300 border border-amber-500/30';
+          statusBox.textContent = `⚠️ 수가 일치하지 않습니다 (수소 H: ${hReact}vs${hProd}, 산소 O: ${oReact}vs${oProd})`;
+          nextBtn.disabled = true;
+          nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+      }
+    }
 
-            markCard: function(isKnown) {
-                const card = this.deck[this.currentIndex];
-                if (!isKnown) {
-                    this.unknownItems.add(card.original);
-                } else {
-                    this.unknownItems.delete(card.original);
-                }
-                
-                // Visual feedback (small bump)
-                const container = document.getElementById('flashcard-container');
-                container.style.transform = 'scale(0.98)';
-                setTimeout(() => container.style.transform = 'none', 100);
+    function requestStep5Hint() {
+      state.hintCount++;
+      const hintBox = document.getElementById('step5HintBox');
+      const hintText = document.getElementById('hintStepText');
+      hintBox.classList.remove('hidden');
 
-                setTimeout(() => {
-                    this.nextCard();
-                }, 150);
-            },
+      if (state.reactionMode === 'gas') {
+        const c = state.step5.gas;
+        c.hintStep = (c.hintStep % 3) + 1;
+        if (c.hintStep === 1) {
+          hintText.textContent = '💡 힌트 1: 메테인(CH₄)에 수소 원자가 4개 있습니다. 생성물 H₂O의 계수를 2로 맞춰 수소 4개를 만들어 보세요.';
+        } else if (c.hintStep === 2) {
+          hintText.textContent = '💡 힌트 2: CO₂ 1개와 H₂O 2개가 되면 반응 후 산소 원자는 총 4개(CO₂에서 2개 + H₂O에서 2개)가 됩니다.';
+        } else {
+          hintText.textContent = '💡 힌트 3: 따라서 반응물 O₂의 계수를 2로 늘리면 산소 4개가 되어 일치하게 됩니다! (1 CH₄ + 2 O₂ → 1 CO₂ + 2 H₂O)';
+        }
+      } else {
+        const c = state.step5.precipitate;
+        c.hintStep = (c.hintStep % 3) + 1;
+        if (c.hintStep === 1) {
+          hintText.textContent = '💡 힌트 1: O₂는 산소가 2개인데, H₂O는 산소가 1개입니다. 생성물 H₂O의 계수를 2로 변경해 보세요.';
+        } else if (c.hintStep === 2) {
+          hintText.textContent = '💡 힌트 2: H₂O 계수가 2가 되면 생성물의 수소(H)가 4개가 됩니다.';
+        } else {
+          hintText.textContent = '💡 힌트 3: 반응물 H₂의 계수를 2로 늘리면 완성됩니다! (2 H₂ + 1 O₂ → 2 H₂O)';
+        }
+      }
 
-            renderTest: function() {
-                if (this.currentIndex >= this.deck.length) {
-                    this.finishStudy();
-                    return;
-                }
+      saveState();
+    }
 
-                const card = this.deck[this.currentIndex];
-                document.getElementById('test-question-text').innerHTML = card.front;
-                document.getElementById('test-question-type').innerText = `${card.frontLabel} → ${card.backLabel} 입력`;
-                
-                const inputEl = document.getElementById('test-input');
-                inputEl.value = '';
-                inputEl.disabled = false;
-                
-                document.getElementById('test-form').classList.remove('hidden');
-                document.getElementById('test-feedback').classList.add('hidden');
-                document.getElementById('btn-submit-test').classList.remove('hidden');
-                
-                this.updateProgress();
-                setTimeout(() => inputEl.focus(), 50);
-            },
+    function submitStep5() {
+      goToStep(6);
+    }
 
-            submitTestAnswer: function(e) {
-                e.preventDefault();
-                const inputEl = document.getElementById('test-input');
-                const userAnswer = inputEl.value.trim();
-                
-                if (!userAnswer) {
-                    // flash red or shake
-                    inputEl.classList.add('border-rose-500');
-                    setTimeout(() => inputEl.classList.remove('border-rose-500'), 500);
-                    return;
-                }
+    function submitStep6AndFinish() {
+      const b1 = document.getElementById('blank1').value;
+      const b2 = document.getElementById('blank2').value;
+      const b3 = document.getElementById('blank3').value;
+      const summaryText = document.getElementById('studentSummaryText').value.trim();
 
-                const card = this.deck[this.currentIndex];
-                const isKoreanAns = card.direction === 'en2ko';
-                
-                const isCorrect = utils.checkAnswer(userAnswer, card.back, isKoreanAns);
-                
-                if (!isCorrect) {
-                    this.unknownItems.add(card.original);
-                } else {
-                    this.unknownItems.delete(card.original);
-                }
+      state.step6.blank1 = b1;
+      state.step6.blank2 = b2;
+      state.step6.blank3 = b3;
+      state.step6.summaryText = summaryText;
 
-                this.testResults.push({
-                    card: card,
-                    isCorrect: isCorrect,
-                    userAnswer: userAnswer
-                });
+      const fbBox = document.getElementById('ruleFeedbackBox');
+      fbBox.classList.remove('hidden');
 
-                this.showTestFeedback(isCorrect, card.back);
-            },
+      const isCorrectBlanks = (b1 === 'conserved' && b2 === 'rearrange' && b3 === 'equal');
 
-            showTestFeedback: function(isCorrect, correctAnswer) {
-                document.getElementById('test-input').disabled = true;
-                document.getElementById('btn-submit-test').classList.add('hidden');
-                
-                const feedbackEl = document.getElementById('test-feedback');
-                const box = document.getElementById('feedback-box');
-                const icon = document.getElementById('feedback-icon');
-                const title = document.getElementById('feedback-title');
-                const detail = document.getElementById('feedback-detail');
+      if (isCorrectBlanks) {
+        fbBox.className = 'p-4 rounded-xl text-xs space-y-1 bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold';
+        fbBox.innerHTML = '✨ 완벽합니다! 원자의 보존이 반응계 전체 질량 보존으로 이어지는 핵심 개념을 정확하게 이해하셨습니다.';
+        setTimeout(() => goToStep(7), 1200);
+      } else {
+        fbBox.className = 'p-4 rounded-xl text-xs space-y-1 bg-amber-100 text-amber-900 border border-amber-300 font-medium';
+        fbBox.innerHTML = '💡 <strong>생각해보기:</strong> 화학 반응 시 원자가 새로 생성되거나 없어지는지, 아니면 배열만 바뀌는지 빈칸을 다시 선택해 보세요.';
+      }
 
-                feedbackEl.classList.remove('hidden');
+      saveState();
+    }
 
-                if (isCorrect) {
-                    box.className = 'p-4 rounded-xl border-2 border-emerald-200 bg-emerald-50 flex items-start gap-3';
-                    icon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
-                    title.innerText = '정답입니다!';
-                    title.className = 'font-bold text-lg mb-1 text-emerald-700';
-                    detail.innerText = '잘하셨어요.';
-                    detail.className = 'text-sm font-medium text-emerald-600';
-                } else {
-                    box.className = 'p-4 rounded-xl border-2 border-rose-200 bg-rose-50 flex items-start gap-3';
-                    icon.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-500"></i>';
-                    title.innerText = '오답입니다!';
-                    title.className = 'font-bold text-lg mb-1 text-rose-700';
-                    detail.innerHTML = `정답은 <span class="text-rose-600 font-bold text-lg mx-1">${correctAnswer}</span> 입니다.`;
-                    detail.className = 'text-sm font-medium text-rose-600';
-                }
+    function renderSummaryReport() {
+      const rx = reactions[state.reactionMode];
+      const container = document.getElementById('reportContent');
 
-                const btnNext = document.getElementById('btn-next-test');
-                btnNext.className = isCorrect 
-                    ? 'mt-4 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-md transition-all'
-                    : 'mt-4 w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 rounded-xl shadow-md transition-all';
-                
-                setTimeout(() => btnNext.focus(), 50);
-            },
+      container.innerHTML = `
+        <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-200 space-y-2">
+          <h3 class="font-bold text-indigo-900">1. 학습 완성한 화학 반응식 (${rx.title})</h3>
+          <p class="font-mono font-bold text-indigo-700 bg-white p-2.5 rounded-xl border border-indigo-100">
+            • 탐구 반응식: ${rx.reactants.map(r => r.formula).join(' + ')} → ${rx.products.map(p => p.formula).join(' + ')}<br>
+            • 계수 조정 완성: ${state.reactionMode === 'gas' ? '1 CH₄ + 2 O₂ → 1 CO₂ + 2 H₂O' : '2 H₂ + 1 O₂ → 2 H₂O'}
+          </p>
+        </div>
 
-            nextTestQuestion: function() {
-                this.currentIndex++;
-                this.renderTest();
-            },
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+          <h3 class="font-bold text-slate-900">2. 원자 입자 모형 비교 및 판별 완료</h3>
+          <p class="text-slate-700">
+            반응 전후 입자 결합 모형을 직접 비교하여 모든 원소의 원자 종류와 수가 일치함을 학생 스스로 검증했습니다.
+          </p>
+        </div>
 
-            finishStudy: function() {
-                this.showScreen('result');
-                const isTest = this.currentMode === 'test';
-                
-                document.getElementById('score-display').classList.toggle('hidden', !isTest);
-                document.getElementById('result-subtitle').innerText = isTest ? '주관식 테스트 결과' : '플래시카드 학습 완료';
-                
-                const listTitle = document.getElementById('result-list-title');
-                const mistakesList = document.getElementById('mistakes-list');
-                const perfectMsg = document.getElementById('perfect-message');
-                const btnRetry = document.getElementById('btn-retry-mistakes');
-                
-                mistakesList.innerHTML = '';
-                
-                let mistakes = [];
-                if (isTest) {
-                    mistakes = this.testResults.filter(r => !r.isCorrect).map(r => r.card);
-                    document.getElementById('score-correct').innerText = this.testResults.length - mistakes.length;
-                    document.getElementById('score-total').innerText = this.testResults.length;
-                    
-                    const ratio = (this.testResults.length - mistakes.length) / this.testResults.length;
-                    document.getElementById('result-emoji').innerText = ratio === 1 ? '🏆' : (ratio > 0.7 ? '👏' : '💪');
-                } else {
-                    // For flashcards, mistakes are just what's currently in unknownItems from this session
-                    // We'll just display everything in the unknown set for simplicity
-                    mistakes = Array.from(this.unknownItems).map(item => ({
-                        front: item.ko,
-                        back: item.symbol,
-                        frontLabel: '한글',
-                        backLabel: item.type === 'element' ? '원소기호' : '화학식'
-                    }));
-                    document.getElementById('result-emoji').innerText = mistakes.length === 0 ? '✨' : '📚';
-                }
+        <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 space-y-2">
+          <h3 class="font-bold text-emerald-900">3. 학생이 작성한 질량 보존 원리 요약</h3>
+          <p class="italic text-emerald-950 bg-white p-3 rounded-xl border border-emerald-100">
+            "${state.step6.summaryText || '질량 보존 원리 설명 작성 완료'}"
+          </p>
+        </div>
 
-                if (mistakes.length === 0) {
-                    listTitle.classList.add('hidden');
-                    mistakesList.classList.add('hidden');
-                    perfectMsg.classList.remove('hidden');
-                    btnRetry.classList.add('hidden');
-                } else {
-                    listTitle.classList.remove('hidden');
-                    listTitle.innerText = isTest ? '틀린 문제 확인하기' : '모르는 단어 확인하기';
-                    mistakesList.classList.remove('hidden');
-                    perfectMsg.classList.add('hidden');
-                    btnRetry.classList.remove('hidden');
-                    
-                    if (!isTest) {
-                        btnRetry.innerText = '모르는 단어만 재학습';
-                    } else {
-                        btnRetry.innerText = '틀린 문제만 재학습';
-                    }
+        <div class="bg-slate-100 p-4 rounded-2xl border border-slate-200 space-y-1 text-slate-600 text-xs">
+          <p>• 활용한 힌트 총 횟수: <strong>${state.hintCount}회</strong></p>
+          <p>• 학습 수행 상태: 6/6 단계 완수 (정답 기반 판별 완료)</p>
+        </div>
+      `;
+    }
 
-                    mistakes.forEach(card => {
-                        const li = document.createElement('li');
-                        li.className = 'bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between';
-                        
-                        const left = document.createElement('div');
-                        left.className = 'font-semibold text-slate-800';
-                        left.innerText = card.front;
-                        
-                        const right = document.createElement('div');
-                        right.className = 'font-bold text-blue-600 text-lg';
-                        right.innerText = card.back;
-                        
-                        li.appendChild(left);
-                        li.appendChild(right);
-                        mistakesList.appendChild(li);
-                    });
-                }
-                
-                this.updateHomeUI(); // Update count for home screen
-            },
+    function toggleTeacherView() {
+      document.getElementById('teacherModal').classList.toggle('hidden');
+    }
 
-            goHome: function() {
-                this.currentMode = null;
-                this.updateHomeUI();
-                this.showScreen('home');
-            }
-        };
+    function openElementModal() {
+      document.getElementById('elementModal').classList.remove('hidden');
+    }
 
-        // Initialize application
-        window.addEventListener('DOMContentLoaded', () => {
-            app.init();
-        });
-
-    </script>
+    function closeElementModal() {
+      document.getElementById('elementModal').classList.add('hidden');
+    }
+  </script>
 </body>
 </html>
